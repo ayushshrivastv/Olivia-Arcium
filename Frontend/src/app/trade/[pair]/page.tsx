@@ -12,10 +12,19 @@ export default async function TradingPage({
   }
 
   // Extract base and quote currency from pair
-  // For pairs like "NYC-MAYORUSDC", we need to split properly
-  // USDC is always 4 characters at the end
-  const baseCurrency = pair.slice(0, -4); // Everything except last 4 chars
-  const quoteCurrency = pair.slice(-4); // Last 4 chars
+  // Handle both formats: "NYC-MAYOR" (just base) or "NYC-MAYORUSDC" (base + quote)
+  let baseCurrency: string;
+  let quoteCurrency: string;
+  
+  if (pair.endsWith('USDC')) {
+    // Has quote currency, split it
+    baseCurrency = pair.slice(0, -4); // Everything except last 4 chars (USDC)
+    quoteCurrency = pair.slice(-4); // Last 4 chars (USDC)
+  } else {
+    // No quote currency, use as-is
+    baseCurrency = pair;
+    quoteCurrency = 'USDC'; // Default quote currency
+  }
 
   return (
     <ClientTradingPage

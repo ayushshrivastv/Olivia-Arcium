@@ -92,30 +92,56 @@ const MOCK_TRADES: TradesResponse = {
   ]
 };
 
-const MOCK_KLINES: KLine[] = [
-  {
-    open: "0.43",
-    high: "0.47",
-    low: "0.42",
-    close: "0.45",
-    volume: "10000",
-    quoteVolume: "4500",
-    trades: "25",
-    start: new Date(Date.now() - 3600000).toISOString(),
-    end: new Date().toISOString()
-  },
-  {
-    open: "0.45",
-    high: "0.48",
-    low: "0.44",
-    close: "0.46",
-    volume: "12000",
-    quoteVolume: "5520",
-    trades: "30",
-    start: new Date(Date.now() - 7200000).toISOString(),
-    end: new Date(Date.now() - 3600000).toISOString()
-  }
-];
+const getMockKlines = (): KLine[] => {
+  const now = Date.now();
+  // Create data points in ascending time order (oldest first)
+  return [
+    {
+      open: "0.42",
+      high: "0.44",
+      low: "0.41",
+      close: "0.43",
+      volume: "8000",
+      quoteVolume: "3440",
+      trades: "20",
+      start: new Date(now - 7200000).toISOString(),
+      end: new Date(now - 5400000).toISOString()
+    },
+    {
+      open: "0.43",
+      high: "0.46",
+      low: "0.42",
+      close: "0.45",
+      volume: "10000",
+      quoteVolume: "4500",
+      trades: "25",
+      start: new Date(now - 5400000).toISOString(),
+      end: new Date(now - 3600000).toISOString()
+    },
+    {
+      open: "0.45",
+      high: "0.48",
+      low: "0.44",
+      close: "0.47",
+      volume: "12000",
+      quoteVolume: "5640",
+      trades: "30",
+      start: new Date(now - 3600000).toISOString(),
+      end: new Date(now - 1800000).toISOString()
+    },
+    {
+      open: "0.47",
+      high: "0.49",
+      low: "0.46",
+      close: "0.48",
+      volume: "13000",
+      quoteVolume: "6240",
+      trades: "35",
+      start: new Date(now - 1800000).toISOString(),
+      end: new Date(now).toISOString()
+    }
+  ];
+};
 
 // Mock API functions - no network calls
 export async function getTicker(market: string): Promise<Market> {
@@ -154,5 +180,5 @@ export async function getKlines(
 ): Promise<KLine[]> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 100));
-  return MOCK_KLINES;
+  return getMockKlines();
 }
