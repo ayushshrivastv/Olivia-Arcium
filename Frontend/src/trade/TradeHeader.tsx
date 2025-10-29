@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react';
 import { getTicker } from '@/src/utils/httpClient';
 import { MarketIcon } from '@/src/market/MarketIcon';
-import { Button } from '@/src/ui/Button';
-import { signOut, useSession } from 'next-auth/react';
 import { SignalingManager } from '@/src/utils/SignalingManager';
 import { TickerPayload } from '@/src/utils/types';
 
@@ -21,7 +19,6 @@ export default function TradeHeader({
   const [price, setPrice] = useState<string>('');
   const [priceChange, setPriceChange] = useState<number>(0);
   const [prevPrice, setPrevPrice] = useState<number | null>(null);
-  const session = useSession();
 
   useEffect(() => {
     const getTickerData = async () => {
@@ -86,23 +83,14 @@ export default function TradeHeader({
           </div>
         </div>
       </div>
-      {session.data?.user?.email && (
-        <div className="flex items-center space-x-6">
-          <div className="flex gap-6 text-sm">
-            <div>
-              <div className="text-muted-foreground">Balance(USDC)</div>
-              <div className="font-medium">$10_000</div>
-            </div>
-            <Button
-              variant="outline"
-              className="rounded-xl border-white text-white bg-transparent hover:bg-white/10"
-              onClick={async () => signOut()}
-            >
-              Log out
-            </Button>
+      <div className="flex items-center space-x-6">
+        <div className="flex gap-6 text-sm">
+          <div>
+            <div className="text-muted-foreground">Balance(USDC)</div>
+            <div className="font-medium">$10_000</div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
