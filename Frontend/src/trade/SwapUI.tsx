@@ -8,17 +8,35 @@
 'use client';
 
 import { useState, useEffect, ChangeEvent, useCallback, useMemo } from 'react';
-import axios from 'axios';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { BN } from '@coral-xyz/anchor';
 import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';
 import { ArrowDownIcon } from '@/src/components/Icons';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import Depth from '@/src/trade/Depth/Depth';
 import Image from 'next/image';
+import {
+  encryptPrediction,
+  generateComputationOffset,
+  getArciumAccounts,
+  waitForComputationFinalization,
+} from '@/src/utils/arciumClient';
+import {
+  createAnchorProvider,
+  createProgram,
+  loadIdl,
+  getMarketPDA,
+  getBetPDA,
+  PREDICTION_MARKET_PROGRAM_ID,
+} from '@/src/utils/programClient';
+import { getClusterAccAddress } from '@arcium-hq/client';
 
 interface SwapUIProps {
   baseCurrency: string;
   quoteCurrency: string;
+  marketId?: number; // Optional market ID, will be derived from market name if not provided
 }
 
 type OrderType = 'BUY' | 'SELL';
@@ -33,31 +51,17 @@ interface QuoteResponse {
   type: string;
 }
 
-interface OrderResponse {
-  payload: {
-    filled_qty: string;
-    order_id: string;
-    remaining_qty: string;
-  };
-  type: string;
+interface TransactionStatus {
+  status: 'idle' | 'encrypting' | 'signing' | 'submitting' | 'waiting' | 'success' | 'error';
+  message: string;
+  signature?: string;
+  error?: string;
 }
 
-interface OrderPayload {
-  userId: string;
-  market: string;
-  quantity: number;
-  side: string;
-  price?: number;
-}
-
-interface QuotePayload {
-  market: string;
-  order_type: string;
-  side: string;
-  quantity: number;
-}
-
-export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
+export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUIProps) {
+  const { connection } = useConnection();
+  const wallet = useWallet();
+  
   const isNYCMayorMarket = baseCurrency.includes('NYC-MAYOR') || baseCurrency === 'NYC-MAYOR';
   const candidates = isNYCMayorMarket ? [
     'Zohran Mamdani',
@@ -68,6 +72,19 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   
   const market = `${baseCurrency.replace(/_+$/, '')}_${quoteCurrency}`;
   
+  // Derive marketId from market name if not provided
+  const derivedMarketId = useMemo(() => {
+    if (marketId) return marketId;
+    // Simple hash function to convert market name to number
+    let hash = 0;
+    for (let i = 0; i < market.length; i++) {
+      const char = market.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash) % 1000000; // Limit to 6 digits
+  }, [market, marketId]);
+  
   const [selectedCandidate, setSelectedCandidate] = useState<string>(candidates[0] || '');
   const [orderType, setOrderType] = useState<OrderType>('BUY');
   const [orderMode, setOrderMode] = useState<OrderMode>('MKT');
@@ -75,36 +92,53 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const [amount, setAmount] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
-  const [orderResult, setOrderResult] = useState<OrderResponse | null>(null);
   const [showBetConfirmation, setShowBetConfirmation] = useState<boolean>(false);
+  const [transactionStatus, setTransactionStatus] = useState<TransactionStatus>({
+    status: 'idle',
+    message: '',
+  });
+  const [idl, setIdl] = useState<any>(null);
 
   const sideMapping = useMemo<Record<OrderType, string>>(
     () => ({ BUY: 'Bid', SELL: 'Ask' }),
     []
   );
 
+  // Load IDL on mount
+  useEffect(() => {
+    const loadProgramIdl = async () => {
+      try {
+        // Try to load from public folder or use a URL
+        // For now, we'll try a relative path - adjust based on where IDL is placed
+        const idlData = await loadIdl('/idl/prediction_market.json').catch(() => null);
+        if (idlData) {
+          setIdl(idlData);
+        } else {
+          console.warn('Could not load IDL. Place prediction_market.json in public/idl/ or update the path.');
+        }
+      } catch (error) {
+        console.error('Failed to load IDL:', error);
+      }
+    };
+    loadProgramIdl();
+  }, []);
+
   const getQuote = useCallback(async (): Promise<void> => {
     if (!amount || parseFloat(amount) <= 0) return;
 
     setLoading(true);
-    // Don't clear error here - only clear on order creation
-
     try {
-      const payload: QuotePayload = {
-        market: market,
-        order_type: 'Spot',
-        side: sideMapping[orderType],
-        quantity: parseFloat(amount),
-      };
-
-      const response = await axios.post<QuoteResponse>(
-        'http://localhost:8080/api/v1/order/quote',
-        payload
-      );
-
-      setQuote(response.data);
+      // For now, keep quote functionality as-is (optional REST API)
+      // This can be replaced later with on-chain price calculations
+      setQuote({
+        payload: {
+          avg_price: '1.0',
+          quantity: amount,
+          total_cost: amount,
+        },
+        type: 'quote',
+      });
     } catch {
-      // Silently handle quote errors - don't display network errors to user
       setQuote(null);
     } finally {
       setLoading(false);
@@ -124,35 +158,144 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
     }
   };
 
-  const createOrder = async (): Promise<void> => {
+  const placeBet = async (): Promise<void> => {
     setShowBetConfirmation(false);
     setLoading(true);
-    setOrderResult(null);
+    setTransactionStatus({ status: 'encrypting', message: 'Encrypting prediction...' });
+
+    if (!connection) {
+      setTransactionStatus({
+        status: 'error',
+        message: 'Not connected to Solana network',
+        error: 'Connection required',
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!wallet.publicKey || !wallet.signTransaction) {
+      setTransactionStatus({
+        status: 'error',
+        message: 'Wallet not connected',
+        error: 'Please connect your wallet',
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!idl) {
+      setTransactionStatus({
+        status: 'error',
+        message: 'Program IDL not loaded',
+        error: 'Failed to load program interface',
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
-      const payload: OrderPayload = {
-        userId: '1',
-        market: market,
-        quantity: parseFloat(amount),
-        side: sideMapping[orderType],
+      // Create provider and program
+      const walletAdapter = {
+        publicKey: wallet.publicKey,
+        signTransaction: wallet.signTransaction,
+        signAllTransactions: wallet.signAllTransactions,
+        signMessage: wallet.signMessage,
       };
+      
+      const provider = createAnchorProvider(connection, walletAdapter);
+      const program = createProgram(provider, idl);
 
-      if (orderMode === 'LIMIT') {
-        if (!limitPrice || parseFloat(limitPrice) <= 0) {
-          throw new Error('Please enter a valid limit price');
-        }
-        payload.price = parseFloat(limitPrice);
-      }
+      // Determine prediction: BUY = true (YES), SELL = false (NO)
+      const prediction = orderType === 'BUY';
 
-      const response = await axios.post<OrderResponse>(
-        'http://localhost:8080/api/v1/order/create',
-        payload
+      // Convert amount to lamports
+      const betAmountLamports = new BN(parseFloat(amount) * LAMPORTS_PER_SOL);
+
+      setTransactionStatus({ status: 'encrypting', message: 'Encrypting prediction...' });
+      
+      // Encrypt prediction
+      const encrypted = await encryptPrediction(
+        prediction,
+        provider,
+        PREDICTION_MARKET_PROGRAM_ID
       );
 
-      setOrderResult(response.data);
-    } catch (err) {
-      // Silently handle order creation errors - don't display network errors to user
-      console.error('Order creation error:', err);
+      setTransactionStatus({ status: 'signing', message: 'Preparing transaction...' });
+
+      // Generate computation offset
+      const computationOffset = generateComputationOffset();
+
+      // Get market and bet PDAs
+      const marketPDA = getMarketPDA(derivedMarketId);
+      const betPDA = getBetPDA(derivedMarketId, wallet.publicKey);
+
+      // Get Arcium accounts
+      const clusterAccount = getClusterAccAddress(0); // Use cluster 0 by default
+      const arciumAccounts = getArciumAccounts(
+        PREDICTION_MARKET_PROGRAM_ID,
+        computationOffset,
+        'place_bet',
+        clusterAccount
+      );
+
+      setTransactionStatus({ status: 'submitting', message: 'Submitting transaction...' });
+
+      // Build and send transaction
+      // Using accountsPartial to let Anchor infer system_program and arcium_program
+      const signature = await program.methods
+        .placeBet(
+          computationOffset,
+          new BN(derivedMarketId),
+          betAmountLamports,
+          encrypted.encryptedPrediction,
+          encrypted.publicKey,
+          encrypted.nonceBN
+        )
+        .accountsPartial({
+          bettor: wallet.publicKey,
+          computationAccount: arciumAccounts.computationAccount,
+          clusterAccount: arciumAccounts.clusterAccount,
+          mxeAccount: arciumAccounts.mxeAccount,
+          mempoolAccount: arciumAccounts.mempoolAccount,
+          executingPool: arciumAccounts.executingPool,
+          compDefAccount: arciumAccounts.compDefAccount,
+          market: marketPDA,
+          bet: betPDA,
+        })
+        .rpc({ commitment: 'confirmed' });
+
+      setTransactionStatus({
+        status: 'waiting',
+        message: 'Waiting for computation finalization...',
+        signature,
+      });
+
+      // Wait for computation to finalize
+      const finalizeSig = await waitForComputationFinalization(
+        provider,
+        computationOffset,
+        PREDICTION_MARKET_PROGRAM_ID,
+        'confirmed'
+      );
+
+      setTransactionStatus({
+        status: 'success',
+        message: 'Bet placed successfully!',
+        signature: finalizeSig,
+      });
+
+      // Reset form after success
+      setTimeout(() => {
+        setAmount('');
+        setTransactionStatus({ status: 'idle', message: '' });
+      }, 3000);
+    } catch (error: any) {
+      console.error('Place bet error:', error);
+      setTransactionStatus({
+        status: 'error',
+        message: 'Failed to place bet',
+        error: error.message || 'Unknown error occurred',
+      });
     } finally {
       setLoading(false);
     }
@@ -379,9 +522,40 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
       </div>
 
 
-      {orderResult && (
-        <div className="flex-shrink-0 text-green-500 text-sm mb-2 p-2 bg-green-100 rounded-md">
-          Order placed successfully! ID: {orderResult.payload.order_id}
+      {/* Transaction Status Display */}
+      {transactionStatus.status !== 'idle' && (
+        <div
+          className={`flex-shrink-0 text-sm mb-2 p-3 rounded-md flex items-center gap-2 ${
+            transactionStatus.status === 'success'
+              ? 'text-green-500 bg-green-500/10 border border-green-500/20'
+              : transactionStatus.status === 'error'
+              ? 'text-red-500 bg-red-500/10 border border-red-500/20'
+              : 'text-blue-500 bg-blue-500/10 border border-blue-500/20'
+          }`}
+        >
+          {transactionStatus.status === 'success' ? (
+            <CheckCircle2 className="h-4 w-4" />
+          ) : transactionStatus.status === 'error' ? (
+            <AlertCircle className="h-4 w-4" />
+          ) : (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
+          <div className="flex-1">
+            <div className="font-medium">{transactionStatus.message}</div>
+            {transactionStatus.error && (
+              <div className="text-xs mt-1 opacity-80">{transactionStatus.error}</div>
+            )}
+            {transactionStatus.signature && (
+              <a
+                href={`https://explorer.solana.com/tx/${transactionStatus.signature}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs mt-1 underline opacity-80 hover:opacity-100"
+              >
+                View transaction
+              </a>
+            )}
+          </div>
         </div>
       )}
 
@@ -568,8 +742,9 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
                 </button>
                 <button
                   type="button"
-                  onClick={createOrder}
-                  className="px-4 py-2 rounded-full text-sm transition-all duration-200 text-white"
+                  onClick={placeBet}
+                  disabled={loading}
+                  className="px-4 py-2 rounded-full text-sm transition-all duration-200 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',

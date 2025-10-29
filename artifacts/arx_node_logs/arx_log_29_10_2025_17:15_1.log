@@ -1,0 +1,137 @@
+2025-10-29T17:15:29.573336Z DEBUG arx: arx/src/main.rs:53: Checking Solana is up and running
+2025-10-29T17:15:29.696883Z  INFO arx: arx/src/main.rs:58: Running ARX
+2025-10-29T17:15:29.697074Z DEBUG arx: arx/src/main.rs:60: Reading node keypair, callback authority keypair, and identity files from env
+2025-10-29T17:15:29.697196Z DEBUG arx: arx/src/main.rs:68: Reading node keypair, callback authority keypair, and identity files
+2025-10-29T17:15:29.707417Z DEBUG arx: arx/src/main.rs:78: Installing AWS LC crypto provider
+2025-10-29T17:15:29.708447Z  INFO arx: arx/src/main.rs:83: Creating ARX coordinator
+2025-10-29T17:15:29.841259Z  INFO arx::units::cache_unit: arx/src/units/cache_unit.rs:88: Cache unit started
+2025-10-29T17:15:29.841995Z  INFO arx::units::circuit_unit: arx/src/units/circuit_unit.rs:107: Circuit unit started
+2025-10-29T17:15:29.845053Z  INFO arx::units::cluster_unit: arx/src/units/cluster_unit.rs:66: Cluster unit started
+2025-10-29T17:15:29.845379Z DEBUG arx::units::cluster_unit: arx/src/units/cluster_unit.rs:68: Running pub/sub for arx node account
+2025-10-29T17:15:29.846595Z  INFO arx::units::computation_transaction_unit: arx/src/units/computation_transaction_unit.rs:89: Computation transaction unit started
+2025-10-29T17:15:29.848205Z  INFO arx::units::execpool_unit: arx/src/units/execpool_unit.rs:80: Execpool unit started
+2025-10-29T17:15:29.848422Z DEBUG arx::units::execpool_unit: arx/src/units/execpool_unit.rs:82: Running pub/sub for mempools accounts
+2025-10-29T17:15:29.849358Z DEBUG arx::units::cluster_unit: arx/src/units/cluster_unit.rs:78: Subscribing to arx node account
+2025-10-29T17:15:29.849477Z  INFO arx::units::computation_unit: arx/src/units/computation_unit.rs:74: Inputs unit started
+2025-10-29T17:15:29.851004Z  INFO arx::units::mempool_unit: arx/src/units/mempool_unit.rs:77: Mempool unit started
+2025-10-29T17:15:29.851073Z DEBUG arx::units::mempool_unit: arx/src/units/mempool_unit.rs:79: Running pub/sub for mempools accounts
+2025-10-29T17:15:29.853224Z  INFO arx::units::mxe_unit: arx/src/units/mxe_unit.rs:75: MXE unit started
+2025-10-29T17:15:29.853916Z  INFO arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:65: Node transaction unit started
+2025-10-29T17:15:29.853955Z DEBUG arx::units::mxe_unit: arx/src/units/mxe_unit.rs:77: Running pub/sub for clusters accounts
+2025-10-29T17:15:29.853957Z  INFO arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:67: Activating node
+2025-10-29T17:15:29.855310Z  INFO arx::units::online_phase_unit: arx/src/units/online_phase_unit.rs:152: Online phase unit started
+2025-10-29T17:15:29.856585Z  INFO arx: arx/src/main.rs:93: Coordinator created successfully
+2025-10-29T17:15:29.856305Z  INFO arx::units::peers_unit: arx/src/units/peers_unit.rs:76: Peers unit started
+2025-10-29T17:15:29.856660Z  INFO arx::units::state_unit: arx/src/units/state_unit.rs:109: State unit started
+2025-10-29T17:15:29.857524Z  INFO arx: arx/src/main.rs:102: Starting ARX coordinator
+2025-10-29T17:15:29.858425Z  INFO arx::program: arx/src/program.rs:242: Pub/sub client started
+2025-10-29T17:15:29.858907Z  INFO arx::program: arx/src/program.rs:244: Connecting initial pub/sub
+2025-10-29T17:15:29.860570Z  INFO arx: arx/src/main.rs:105: Waiting for Ctrl+C
+2025-10-29T17:15:29.861040Z  INFO arx::program: arx/src/program.rs:242: Pub/sub client started
+2025-10-29T17:15:29.861078Z  INFO arx::program: arx/src/program.rs:244: Connecting initial pub/sub
+2025-10-29T17:15:29.861763Z  INFO arx::coordinator: arx/src/coordinator.rs:198: Coordinator started
+2025-10-29T17:15:29.862573Z  INFO arx::program: arx/src/program.rs:242: Pub/sub client started
+2025-10-29T17:15:29.862677Z  INFO arx::program: arx/src/program.rs:244: Connecting initial pub/sub
+2025-10-29T17:15:29.864750Z  INFO arx::program: arx/src/program.rs:242: Pub/sub client started
+2025-10-29T17:15:29.864791Z  INFO arx::program: arx/src/program.rs:244: Connecting initial pub/sub
+2025-10-29T17:15:29.879315Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:29.900158Z  INFO arx::program: arx/src/program.rs:267: Fetching initial state for account: XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9
+2025-10-29T17:15:29.902061Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:30.887027Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:30.906010Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:32.892587Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:32.909605Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:36.900106Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:36.914806Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:44.907113Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:44.908507Z  WARN arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:68: Attempt 1/5: RPC error while calling self.activate_node(): RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:44.920510Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:44.921189Z ERROR arx::program: arx/src/program.rs:276: Failed to fetch initial state for account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:44.921542Z  INFO arx::program: arx/src/program.rs:279: Subscribing to account: XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9
+2025-10-29T17:15:45.915596Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:46.919881Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:48.924060Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:15:52.931662Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:00.937548Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:00.938543Z  WARN arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:68: Attempt 2/5: RPC error while calling self.activate_node(): RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:02.945657Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:03.949680Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:04.621606Z  WARN arx::program: arx/src/program.rs:322: Pub/sub connection closed or error occurred, reconnecting...
+2025-10-29T17:16:04.622798Z  INFO arx::program: arx/src/program.rs:327: Reconnecting pub/sub client
+2025-10-29T17:16:04.625413Z  WARN arx::program: arx/src/program.rs:375: Attempt 1/5: Failed to create new pub/sub: unable to connect to server
+2025-10-29T17:16:05.633047Z  WARN arx::program: arx/src/program.rs:375: Attempt 2/5: Failed to create new pub/sub: unable to connect to server
+2025-10-29T17:16:05.962503Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: AccountNotFound: pubkey=XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: error sending request for url (http://host.docker.internal:8899/): error trying to connect: tcp connect error: Connection refused (os error 111)
+2025-10-29T17:16:07.641577Z  WARN arx::program: arx/src/program.rs:375: Attempt 3/5: Failed to create new pub/sub: unable to connect to server
+2025-10-29T17:16:09.981596Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:11.655986Z  INFO arx::program: arx/src/program.rs:337: Re-fetching initial state for account: XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9
+2025-10-29T17:16:11.662672Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:12.667931Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:14.672463Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:17.987466Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:17.987847Z  WARN arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:68: Attempt 3/5: RPC error while calling self.activate_node(): RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:18.676024Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:21.991669Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:22.996810Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:25.004188Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:26.683645Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:26.684565Z ERROR arx::program: arx/src/program.rs:346: Failed to re-fetch initial state for account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:26.685894Z  INFO arx::program: arx/src/program.rs:349: Re-subscribing to account: XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9
+2025-10-29T17:16:29.008297Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:37.016247Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:37.017794Z  WARN arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:68: Attempt 4/5: RPC error while calling self.activate_node(): RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:45.024017Z  WARN arx::program: arx/src/program.rs:144: Attempt 1/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:46.032029Z  WARN arx::program: arx/src/program.rs:144: Attempt 2/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:48.040268Z  WARN arx::program: arx/src/program.rs:144: Attempt 3/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:16:52.043683Z  WARN arx::program: arx/src/program.rs:144: Attempt 4/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:17:00.052240Z  WARN arx::program: arx/src/program.rs:144: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:17:00.053056Z  WARN arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:68: Attempt 5/5: RPC error while calling self.activate_node(): RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found
+2025-10-29T17:17:00.053908Z ERROR arx::units::node_transaction_unit: arx/src/units/node_transaction_unit.rs:73: Failed to activate node: RPC error: Attempt 5/5: RPC error: Attempt 5/5: Failed to fetch account XdfSwb8ZajhN7CerfBSJVhyfx5fyLtv34QVKSRgMFA9: Account not found, shutting down
+2025-10-29T17:17:00.055355Z ERROR arx::coordinator: arx/src/coordinator.rs:208: Activation unit channel dropped without activation
+2025-10-29T17:17:00.055584Z  INFO arx::coordinator: arx/src/coordinator.rs:437: Coordinator stopped
+2025-10-29T17:17:00.061308Z  INFO arx: arx/src/main.rs:112: Shutdown channel closed, initiating shutdown
+2025-10-29T17:17:00.061906Z  INFO arx::units::circuit_unit: arx/src/units/circuit_unit.rs:113: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.062611Z  INFO arx::units::cache_unit: arx/src/units/cache_unit.rs:94: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.062773Z  INFO arx::units::cache_unit: arx/src/units/cache_unit.rs:138: Cache unit stopped
+2025-10-29T17:17:00.062735Z  INFO arx::units::circuit_unit: arx/src/units/circuit_unit.rs:139: Circuit unit stopped
+2025-10-29T17:17:00.064610Z  INFO arx::units::cluster_unit: arx/src/units/cluster_unit.rs:91: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.064850Z  INFO arx::units::execpool_unit: arx/src/units/execpool_unit.rs:96: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.064922Z  INFO arx::units::computation_transaction_unit: arx/src/units/computation_transaction_unit.rs:95: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.065016Z  INFO arx::units::computation_transaction_unit: arx/src/units/computation_transaction_unit.rs:132: Computations transaction unit stopped
+2025-10-29T17:17:00.064937Z  INFO arx::units::execpool_unit: arx/src/units/execpool_unit.rs:164: Execpool unit stopped
+2025-10-29T17:17:00.065666Z  INFO arx::units::computation_unit: arx/src/units/computation_unit.rs:80: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.065818Z  INFO arx::units::cluster_unit: arx/src/units/cluster_unit.rs:121: Cluster unit stopped
+2025-10-29T17:17:00.066369Z  INFO arx::units::computation_unit: arx/src/units/computation_unit.rs:153: Computation unit stopped
+2025-10-29T17:17:00.066613Z  INFO arx::units::mempool_unit: arx/src/units/mempool_unit.rs:93: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.066738Z  INFO arx::units::mempool_unit: arx/src/units/mempool_unit.rs:155: Mempool unit stopped
+2025-10-29T17:17:00.073164Z  INFO arx::units::state_unit: arx/src/units/state_unit.rs:115: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.073594Z  INFO arx::units::state_unit: arx/src/units/state_unit.rs:149: State unit stopped
+2025-10-29T17:17:00.073633Z  INFO arx: arx/src/main.rs:117: Coordinator completed successfully
+2025-10-29T17:17:00.075506Z  INFO arx::units::online_phase_unit: arx/src/units/online_phase_unit.rs:158: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.075940Z  INFO arx::units::peers_unit: arx/src/units/peers_unit.rs:82: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.076337Z  INFO arx::units::online_phase_unit: arx/src/units/online_phase_unit.rs:300: Waiting for computations to finish...
+2025-10-29T17:17:00.076519Z  INFO arx::units::online_phase_unit: arx/src/units/online_phase_unit.rs:307: Online phase unit stopped
+2025-10-29T17:17:00.076849Z  INFO arx::units::peers_unit: arx/src/units/peers_unit.rs:105: Peers unit stopped
+2025-10-29T17:17:00.077611Z  INFO arx::program: arx/src/program.rs:305: Account subscription channel closed, shutting down pub/sub
+2025-10-29T17:17:00.078201Z  INFO arx::program: arx/src/program.rs:305: Account subscription channel closed, shutting down pub/sub
+2025-10-29T17:17:00.078499Z  INFO arx::program: arx/src/program.rs:365: Pub/sub client stopped
+2025-10-29T17:17:00.078713Z  INFO arx::program: arx/src/program.rs:260: T channel closed, shutting down pub/sub
+2025-10-29T17:17:00.078791Z  INFO arx::program: arx/src/program.rs:365: Pub/sub client stopped
+2025-10-29T17:17:00.079624Z  INFO arx::units::mxe_unit: arx/src/units/mxe_unit.rs:91: Coordinator channel closed, shutting down
+2025-10-29T17:17:00.079902Z  INFO arx::program: arx/src/program.rs:365: Pub/sub client stopped
+2025-10-29T17:17:00.081153Z  INFO arx::units::mxe_unit: arx/src/units/mxe_unit.rs:149: MXE unit stopped
+2025-10-29T17:17:00.086579Z  INFO arx::program: arx/src/program.rs:260: T channel closed, shutting down pub/sub
+2025-10-29T17:17:00.087398Z  INFO arx::program: arx/src/program.rs:365: Pub/sub client stopped
+2025-10-29T17:17:00.087851Z  INFO network::router::network_router: /home/runner/.cargo/git/checkouts/async-mpc-1dbbf554a14e7a32/b307074/network/src/router/network_router.rs:323: Router dropped.    
+2025-10-29T17:17:00.092696Z  WARN network::router::network_router: /home/runner/.cargo/git/checkouts/async-mpc-1dbbf554a14e7a32/b307074/network/src/router/network_router.rs:114: Router dropped.    
+2025-10-29T17:17:00.095329Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095386Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095424Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095462Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095499Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095534Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095572Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095605Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095640Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095675Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.095710Z  INFO arx: arx/src/main.rs:123: Unit completed successfully
+2025-10-29T17:17:00.096112Z  INFO arx: arx/src/main.rs:123: Unit completed successfully

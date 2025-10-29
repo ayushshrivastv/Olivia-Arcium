@@ -1,0 +1,4 @@
+[stderr]  arx-node-1 Pulling 
+[stderr]  arx-node-0 Pulling 
+[stderr]  arx-node-0  Interrupted
+[stderr] no matching manifest for linux/arm64/v8 in the manifest list entries

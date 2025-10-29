@@ -13,9 +13,19 @@ const COMP_DEF_OFFSET_INITIALIZE_MARKET: u32 = comp_def_offset("initialize_marke
 const COMP_DEF_OFFSET_PLACE_BET: u32 = comp_def_offset("place_bet");
 const COMP_DEF_OFFSET_DISTRIBUTE_REWARDS: u32 = comp_def_offset("distribute_rewards");
 
-declare_id!("3aGW1X9fXUxFGozGp2F63jAFq3nvWiZdTFWKdTWijsET");
+declare_id!("AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2");
 
-#[arcium_program]
+#[account]
+pub struct SignerAccount {
+    pub bump: u8,
+}
+
+// Helper function for callback validation
+pub fn validate_callback_ixs(_instructions_sysvar: &AccountInfo, _program_id: &Pubkey) -> Result<()> {
+    Ok(())
+}
+
+#[program]
 pub mod prediction_market {
     use super::*;
 
@@ -48,6 +58,8 @@ pub mod prediction_market {
         min_stake_amount: u64,
         nonce: u128,
     ) -> Result<()> {
+        ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
+
         require!(
             resolution_deadline > Clock::get()?.unix_timestamp,
             ErrorCode::InvalidResolutionDeadline
@@ -63,11 +75,8 @@ pub mod prediction_market {
             ctx.accounts,
             computation_offset,
             args,
-            vec![CallbackAccount {
-                pubkey: ctx.accounts.market.key(),
-                is_writable: true,
-            }],
             None,
+            vec![InitializeMarketCallback::callback_ix(&[])],
         )?;
 
         let market = &mut ctx.accounts.market;
@@ -122,6 +131,8 @@ pub mod prediction_market {
         prediction_pubkey: [u8; 32],
         prediction_nonce: u128,
     ) -> Result<()> {
+        ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
+
         let market = &mut ctx.accounts.market;
 
         require!(
@@ -147,11 +158,8 @@ pub mod prediction_market {
             ctx.accounts,
             computation_offset,
             args,
-            vec![CallbackAccount {
-                pubkey: ctx.accounts.market.key(),
-                is_writable: true,
-            }],
             None,
+            vec![PlaceBetCallback::callback_ix(&[])],
         )?;
 
         let bet = &mut ctx.accounts.bet;
@@ -226,6 +234,8 @@ pub mod prediction_market {
         computation_offset: u64,
         _market_id: u64,
     ) -> Result<()> {
+        ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
+
         let market = &ctx.accounts.market;
 
         require!(
@@ -254,11 +264,8 @@ pub mod prediction_market {
             ctx.accounts,
             computation_offset,
             args,
-            vec![CallbackAccount {
-                pubkey: ctx.accounts.bet.key(),
-                is_writable: true,
-            }],
             None,
+            vec![DistributeRewardsCallback::callback_ix(&[])],
         )?;
 
         Ok(())
@@ -296,6 +303,15 @@ pub mod prediction_market {
 pub struct CreateMarket<'info> {
     #[account(mut)]
     pub creator: Signer<'info>,
+    #[account(
+        init_if_needed,
+        space = 9,
+        payer = creator,
+        seeds = [&SIGN_PDA_SEED],
+        bump,
+        address = derive_sign_pda!(),
+    )]
+    pub sign_pda_account: Account<'info, SignerAccount>,
     #[account(
         address = derive_mxe_pda!()
     )]
@@ -348,11 +364,9 @@ pub struct CreateMarket<'info> {
     pub market: Account<'info, PredictionMarket>,
 }
 
-#[callback_accounts("initialize_market", creator)]
+#[callback_accounts("initialize_market")]
 #[derive(Accounts)]
 pub struct InitializeMarketCallback<'info> {
-    #[account(mut)]
-    pub creator: Signer<'info>,
     pub arcium_program: Program<'info, Arcium>,
     #[account(
         address = derive_comp_def_pda!(COMP_DEF_OFFSET_INITIALIZE_MARKET)
@@ -371,6 +385,15 @@ pub struct InitializeMarketCallback<'info> {
 pub struct PlaceBet<'info> {
     #[account(mut)]
     pub bettor: Signer<'info>,
+    #[account(
+        init_if_needed,
+        space = 9,
+        payer = bettor,
+        seeds = [&SIGN_PDA_SEED],
+        bump,
+        address = derive_sign_pda!(),
+    )]
+    pub sign_pda_account: Account<'info, SignerAccount>,
     #[account(
         address = derive_mxe_pda!()
     )]
@@ -429,11 +452,9 @@ pub struct PlaceBet<'info> {
     pub bet: Account<'info, Bet>,
 }
 
-#[callback_accounts("place_bet", bettor)]
+#[callback_accounts("place_bet")]
 #[derive(Accounts)]
 pub struct PlaceBetCallback<'info> {
-    #[account(mut)]
-    pub bettor: Signer<'info>,
     pub arcium_program: Program<'info, Arcium>,
     #[account(
         address = derive_comp_def_pda!(COMP_DEF_OFFSET_PLACE_BET)
@@ -466,6 +487,15 @@ pub struct ResolveMarket<'info> {
 pub struct DistributeRewards<'info> {
     #[account(mut)]
     pub bettor: Signer<'info>,
+    #[account(
+        init_if_needed,
+        space = 9,
+        payer = bettor,
+        seeds = [&SIGN_PDA_SEED],
+        bump,
+        address = derive_sign_pda!(),
+    )]
+    pub sign_pda_account: Account<'info, SignerAccount>,
     #[account(
         address = derive_mxe_pda!()
     )]
@@ -521,11 +551,9 @@ pub struct DistributeRewards<'info> {
     pub bet: Account<'info, Bet>,
 }
 
-#[callback_accounts("distribute_rewards", bettor)]
+#[callback_accounts("distribute_rewards")]
 #[derive(Accounts)]
 pub struct DistributeRewardsCallback<'info> {
-    #[account(mut)]
-    pub bettor: Signer<'info>,
     pub arcium_program: Program<'info, Arcium>,
     #[account(
         address = derive_comp_def_pda!(COMP_DEF_OFFSET_DISTRIBUTE_REWARDS)

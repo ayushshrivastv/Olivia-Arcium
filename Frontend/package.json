@@ -21,6 +21,8 @@
     "@solana/wallet-adapter-wallets": "^0.19.33",
     "@solana/web3.js": "^1.98.4",
     "@tabler/icons-react": "^3.35.0",
+    "@arcium-hq/client": "0.3.0",
+    "@coral-xyz/anchor": "0.31.1",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
