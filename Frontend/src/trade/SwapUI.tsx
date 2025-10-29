@@ -165,55 +165,57 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
 
   const session = useSession();
   return (
-    <>
-      <div className="flex mb-4">
-        <Button
-          className={`flex-1 ${
-            orderType === 'BUY'
-              ? 'bg-white text-green-500'
-              : 'bg-card hover:bg-card/90 text-green-500'
-          } rounded-l-xl rounded-r-none border border-border font-semibold`}
-          onClick={() => handleOrderTypeChange('BUY')}
-        >
-          BUY
-        </Button>
-        <Button
-          className={`flex-1 ${
-            orderType === 'SELL'
-              ? 'bg-white text-red-500'
-              : 'bg-card hover:bg-card/90 text-red-500'
-          } rounded-r-xl rounded-l-none border border-l-0 border-border font-semibold`}
-          onClick={() => handleOrderTypeChange('SELL')}
-        >
-          SELL
-        </Button>
-      </div>
+    <div className="flex flex-col h-full overflow-y-auto">
+      <div className="flex-shrink-0">
+        <div className="flex mb-4">
+          <Button
+            className={`flex-1 ${
+              orderType === 'BUY'
+                ? 'bg-white text-green-500'
+                : 'bg-card hover:bg-card/90 text-green-500'
+            } rounded-l-xl rounded-r-none border border-border font-semibold`}
+            onClick={() => handleOrderTypeChange('BUY')}
+          >
+            BUY
+          </Button>
+          <Button
+            className={`flex-1 ${
+              orderType === 'SELL'
+                ? 'bg-white text-red-500'
+                : 'bg-card hover:bg-card/90 text-red-500'
+            } rounded-r-xl rounded-l-none border border-l-0 border-border font-semibold`}
+            onClick={() => handleOrderTypeChange('SELL')}
+          >
+            SELL
+          </Button>
+        </div>
 
-      <div className="flex mb-4">
-        <Button
-          className={`flex-1 ${
-            orderMode === 'MKT'
-              ? 'bg-white text-black'
-              : 'bg-card hover:bg-card/90 text-foreground'
-          } rounded-l-xl rounded-r-none border border-border`}
-          onClick={() => handleOrderModeChange('MKT')}
-        >
-          MKT
-        </Button>
-        <Button
-          className={`flex-1 ${
-            orderMode === 'LIMIT'
-              ? 'bg-white text-background'
-              : 'bg-card hover:bg-card/90 text-foreground'
-          } rounded-r-xl rounded-l-none border border-l-0 border-border`}
-          onClick={() => handleOrderModeChange('LIMIT')}
-        >
-          LIMIT
-        </Button>
+        <div className="flex mb-4">
+          <Button
+            className={`flex-1 ${
+              orderMode === 'MKT'
+                ? 'bg-white text-black'
+                : 'bg-card hover:bg-card/90 text-foreground'
+            } rounded-l-xl rounded-r-none border border-border`}
+            onClick={() => handleOrderModeChange('MKT')}
+          >
+            MKT
+          </Button>
+          <Button
+            className={`flex-1 ${
+              orderMode === 'LIMIT'
+                ? 'bg-white text-background'
+                : 'bg-card hover:bg-card/90 text-foreground'
+            } rounded-r-xl rounded-l-none border border-l-0 border-border`}
+            onClick={() => handleOrderModeChange('LIMIT')}
+          >
+            LIMIT
+          </Button>
+        </div>
       </div>
 
       {orderMode === 'LIMIT' && (
-        <div className="mb-4">
+        <div className="flex-shrink-0 mb-4">
           <div className="flex justify-between items-center text-sm mb-2">
             <span>Limit Price:</span>
             <div className="bg-secondary text-xs rounded-md px-2 py-1">
@@ -231,7 +233,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
         </div>
       )}
 
-      <div className="mb-4">
+      <div className="flex-shrink-0 mb-4">
         <div className="flex justify-between items-center text-sm mb-2">
           <span>Amount:</span>
           <div className="flex gap-2">
@@ -269,7 +271,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
         </div>
       </div>
 
-      <div className="flex justify-between items-center text-sm mb-2">
+      <div className="flex-shrink-0 flex justify-between items-center text-sm mb-2">
         <span>Execution</span>
         <span
           className={orderType === 'BUY' ? 'text-green-500' : 'text-red-500'}
@@ -279,17 +281,18 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
       </div>
 
       {error && (
-        <div className="text-red-500 text-sm mb-2 p-2 bg-red-100 rounded-md">
+        <div className="flex-shrink-0 text-red-500 text-sm mb-2 p-2 bg-red-100 rounded-md">
           {error}
         </div>
       )}
 
       {orderResult && (
-        <div className="text-green-500 text-sm mb-2 p-2 bg-green-100 rounded-md">
+        <div className="flex-shrink-0 text-green-500 text-sm mb-2 p-2 bg-green-100 rounded-md">
           Order placed successfully! ID: {orderResult.payload.order_id}
         </div>
       )}
 
+      <div className="flex-shrink-0 mt-auto">
       {session.data?.user?.email ? (
         <Button
           onClick={createOrder}
@@ -329,6 +332,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
           Sign In to Trade
         </Button>
       )}
-    </>
+      </div>
+    </div>
   );
 }
