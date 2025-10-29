@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { IconRocket } from '@tabler/icons-react';
 
 export default function HeroSection() {
@@ -14,7 +15,25 @@ export default function HeroSection() {
           Predict Them. Profit From Them.
         </h1>
         <p className="text-white text-lg mb-8 max-w-2xl mx-auto" style={{ textShadow: '0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 2px 2px 6px rgba(0,0,0,1)', WebkitTextStroke: '0.5px rgba(0,0,0,0.8)' }}>
-          Experience Olivia, the prediction market of the future — seamlessly powered by Arcium — the transparent layer for private prediction.
+          Experience Olivia, the prediction market of the future seamlessly powered by{' '}
+          <span 
+            className="inline-flex items-center rounded-full px-4 py-2 text-sm transition-all duration-200 text-white"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              fontFamily: 'GT America Mono, monospace',
+            }}
+          >
+            <Image 
+              src="/Arcium Icon.png" 
+              alt="Arcium" 
+              width={60} 
+              height={14}
+              className="h-4 w-auto"
+            />
+          </span>
+          {' '}— the transparent layer for private prediction.
         </p>
         <div className="flex justify-center space-x-4">
           <Link
