@@ -94,7 +94,7 @@ export default function ClientTradingPage({
   }, []);
 
   return (
-    <MainLayout showFooter={false}>
+    <MainLayout showFooter={false} showSocialIcons={false}>
       <div className="flex flex-col bg-background text-foreground overflow-hidden" style={{ height: 'calc(100vh - 80px)' }}>
         <TradeHeader baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
 
