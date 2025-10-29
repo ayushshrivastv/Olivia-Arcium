@@ -17,18 +17,28 @@ export const YesTable = ({ bids, isNYCMayorMarket = false }: YesTableProps) => {
 
   const maxTotal = currentTotal;
 
+  // For NYC Mayor market, generate Yes percentages around 86-90%
+  const yesPercentages = isNYCMayorMarket ? [88, 87, 89, 90, 86, 88, 87, 89, 90, 86] : null;
+
   return (
     <div>
-      {bidsWithTotal.map(([price, quantity, total]) => (
-        <Yes
-          maxTotal={maxTotal}
-          total={total}
-          key={price}
-          price={price}
-          quantity={quantity}
-          isNYCMayorMarket={isNYCMayorMarket}
-        />
-      ))}
+      {bidsWithTotal.map(([price, quantity, total], index) => {
+        // For NYC Mayor market, override price with calculated Yes percentage
+        const displayPrice = isNYCMayorMarket && yesPercentages
+          ? (yesPercentages[index % yesPercentages.length] / 100).toFixed(5)
+          : price;
+        
+        return (
+          <Yes
+            maxTotal={maxTotal}
+            total={total}
+            key={`${price}-${index}`}
+            price={displayPrice}
+            quantity={quantity}
+            isNYCMayorMarket={isNYCMayorMarket}
+          />
+        );
+      })}
     </div>
   );
 };

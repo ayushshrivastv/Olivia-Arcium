@@ -17,18 +17,28 @@ export const NoTable = ({ asks, isNYCMayorMarket = false }: NoTableProps) => {
 
   const maxTotal = currentTotal;
 
+  // For NYC Mayor market, generate No percentages around 10-13%
+  const noPercentages = isNYCMayorMarket ? [12, 11, 13, 10, 12, 11, 13, 10, 12, 11] : null;
+
   return (
     <div>
-      {asksWithTotal.map(([price, quantity, total]) => (
-        <No
-          maxTotal={maxTotal}
-          key={price}
-          price={price}
-          quantity={quantity}
-          total={total}
-          isNYCMayorMarket={isNYCMayorMarket}
-        />
-      ))}
+      {asksWithTotal.map(([price, quantity, total], index) => {
+        // For NYC Mayor market, override price with calculated No percentage
+        const displayPrice = isNYCMayorMarket && noPercentages
+          ? (noPercentages[index % noPercentages.length] / 100).toFixed(5)
+          : price;
+        
+        return (
+          <No
+            maxTotal={maxTotal}
+            key={`${price}-${index}`}
+            price={displayPrice}
+            quantity={quantity}
+            total={total}
+            isNYCMayorMarket={isNYCMayorMarket}
+          />
+        );
+      })}
     </div>
   );
 };
