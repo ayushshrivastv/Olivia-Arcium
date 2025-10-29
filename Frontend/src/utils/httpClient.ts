@@ -23,6 +23,15 @@ const MOCK_MARKETS: Market[] = [
   {
     name: "Government Shutdown",
     description: "Will there be a government shutdown in 2024?",
+    base_asset: "GOV-SHUTDOWN",
+    quote_asset: "USDC",
+    start_time: "2024-01-01T00:00:00Z",
+    end_time: "2024-12-31T23:59:59Z",
+    status: "Ongoing"
+  },
+  {
+    name: "Government Shutdown",
+    description: "Will there be a government shutdown in 2024?",
     base_asset: "GOVSHUTDOWN",
     quote_asset: "USDC",
     start_time: "2024-01-01T00:00:00Z",
@@ -36,6 +45,42 @@ const MOCK_MARKETS: Market[] = [
     quote_asset: "USDC",
     start_time: "2024-01-01T00:00:00Z",
     end_time: "2024-11-05T23:59:59Z",
+    status: "Ongoing"
+  },
+  {
+    name: "Mamdani Victory Margin",
+    description: "Will Mamdani win with a 10-20% margin?",
+    base_asset: "MAMDANI-MARGIN",
+    quote_asset: "USDC",
+    start_time: "2024-01-01T00:00:00Z",
+    end_time: "2025-11-05T23:59:59Z",
+    status: "Ongoing"
+  },
+  {
+    name: "Presidential Election 2028",
+    description: "Will JD Vance win the 2028 US Presidential Election?",
+    base_asset: "PRES-2028",
+    quote_asset: "USDC",
+    start_time: "2024-01-01T00:00:00Z",
+    end_time: "2028-11-05T23:59:59Z",
+    status: "Ongoing"
+  },
+  {
+    name: "Solana Price October",
+    description: "What price will Solana hit in October?",
+    base_asset: "SOL-PRICE",
+    quote_asset: "USDC",
+    start_time: "2024-01-01T00:00:00Z",
+    end_time: "2024-10-31T23:59:59Z",
+    status: "Ongoing"
+  },
+  {
+    name: "Polymarket US Launch",
+    description: "Will Polymarket go live in the US in 2025?",
+    base_asset: "POLY-US",
+    quote_asset: "USDC",
+    start_time: "2024-01-01T00:00:00Z",
+    end_time: "2025-12-31T23:59:59Z",
     status: "Ongoing"
   }
 ];
