@@ -289,7 +289,7 @@ Located in `artifacts/docker-compose-arx-env.yml`:
 
 ## License
 
-Apache 2.0
+This project is licensed under the Apache 2.0 License. See the [LICENSE](../LICENSE) file in the root directory for details.
 
 ---
 
