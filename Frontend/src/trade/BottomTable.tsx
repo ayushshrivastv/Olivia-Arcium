@@ -11,7 +11,7 @@ import { Trade } from '@/src/utils/types';
 import { getTrades } from '@/src/utils/httpClient';
 import { SignalingManager } from '@/src/utils/SignalingManager';
 
-export default function BottomTable({ market }: { market: string }) {
+export default function BottomTable({ market, baseCurrency, quoteCurrency }: { market: string; baseCurrency?: string; quoteCurrency?: string }) {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -135,6 +135,8 @@ export default function BottomTable({ market }: { market: string }) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs text-muted-foreground">
+                      <th className="text-left py-2">Sol</th>
+                      <th className="text-left py-2">USDC</th>
                       <th className="text-left py-2">Price</th>
                       <th className="text-left py-2">Quantity</th>
                       <th className="text-left py-2">Currency</th>
@@ -146,24 +148,37 @@ export default function BottomTable({ market }: { market: string }) {
               <div className="overflow-y-auto flex-1 min-h-0">
                 <table className="w-full text-sm">
                   <tbody>
-                    {trades.map((trade, index) => (
-                      <tr key={index} className="border-t border-border/10">
-                        <td
-                          className={`py-2 pr-8 ${
-                            trade.side === 'Ask'
-                              ? 'text-red-500'
-                              : 'text-green-500'
-                          }`}
-                        >
-                          ${trade.price.toFixed(2)}
-                        </td>
-                        <td className="py-2 pr-18">
-                          {trade.quantity.toFixed(2)}
-                        </td>
-                        <td className="py-2 pr-18">{trade.currency_code}</td>
-                        <td className="py-2 pr-8">{formatDate(trade.time)}</td>
-                      </tr>
-                    ))}
+                    {trades.map((trade, index) => {
+                      // Calculate Sol and USDC values
+                      // For SOL/USDC pair: quantity is in SOL, price is in USDC per SOL
+                      const solAmount = trade.quantity; // SOL amount (base currency)
+                      const usdcAmount = trade.price * trade.quantity; // USDC amount (quote currency)
+                      
+                      return (
+                        <tr key={index} className="border-t border-border/10">
+                          <td className="py-2 pr-8">
+                            {solAmount.toFixed(4)}
+                          </td>
+                          <td className="py-2 pr-8">
+                            {usdcAmount.toFixed(2)}
+                          </td>
+                          <td
+                            className={`py-2 pr-8 ${
+                              trade.side === 'Ask'
+                                ? 'text-red-500'
+                                : 'text-green-500'
+                            }`}
+                          >
+                            ${trade.price.toFixed(2)}
+                          </td>
+                          <td className="py-2 pr-8">
+                            {trade.quantity.toFixed(2)}
+                          </td>
+                          <td className="py-2 pr-8">SOL/USDC</td>
+                          <td className="py-2 pr-8">{formatDate(trade.time)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

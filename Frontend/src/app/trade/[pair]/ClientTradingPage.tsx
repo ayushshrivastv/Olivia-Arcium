@@ -22,6 +22,7 @@ export default function ClientTradingPage({
   const containerRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
   const isResizingRef = useRef(false);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -30,10 +31,20 @@ export default function ClientTradingPage({
     // Initialize with default ratio (2:1)
     const updateInitialHeight = () => {
       const padding = 16;
-      const gap = 8;
-      const availableHeight = container.clientHeight - (padding * 2) - gap;
-      const initialChartHeight = (availableHeight * 2) / 3;
-      setChartHeight(initialChartHeight);
+      const resizeHandleHeight = 8; // h-2 = 8px
+      const resizeHandleMargin = 8; // my-1 = 4px top + 4px bottom = 8px
+      const minTableHeight = 100;
+      const availableHeight = container.clientHeight - (padding * 2) - resizeHandleHeight - resizeHandleMargin;
+      const calculatedHeight = (availableHeight * 2) / 3;
+      const maxChartHeight = availableHeight - minTableHeight;
+      // Minimum: ChartControl + chart + dates = ~320px
+      const minChartHeight = 320;
+      // Ensure initial height respects both min and max constraints
+      const initialChartHeight = Math.max(minChartHeight, Math.min(maxChartHeight, calculatedHeight));
+      if (!isInitializedRef.current) {
+        setChartHeight(initialChartHeight);
+        isInitializedRef.current = true;
+      }
     };
     
     updateInitialHeight();
@@ -43,54 +54,62 @@ export default function ClientTradingPage({
     resizeObserver.observe(container);
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizingRef.current || !container) return;
+      if (!isResizingRef.current) return;
+      
+      const currentContainer = containerRef.current;
+      if (!currentContainer) {
+        isResizingRef.current = false;
+        return;
+      }
 
-      const containerRect = container.getBoundingClientRect();
+      const containerRect = currentContainer.getBoundingClientRect();
       const padding = 16; // p-4 = 16px
-      const gap = 8; // gap-2 = 8px
-      const y = e.clientY - containerRect.top - padding;
+      const resizeHandleHeight = 8; // h-2 = 8px
+      const resizeHandleMargin = 8; // my-1 = 4px top + 4px bottom = 8px
+      
+      // Calculate mouse position relative to container top
+      const mouseY = e.clientY - containerRect.top;
+      const y = mouseY - padding;
       
       // Calculate new heights with constraints
-      const minChartHeight = 200;
-      const minTableHeight = 150;
-      const availableHeight = container.clientHeight - (padding * 2) - gap;
+      // Minimum chart height: ChartControl (~48px) + chart area (~220px) + date labels (~52px) = ~320px
+      // This ensures chart and dates are fully visible
+      const minChartHeight = 320;
+      // Minimum table height: enough to show tabs (tabs ~48px + padding ~52px)
+      const minTableHeight = 100;
+      const availableHeight = currentContainer.clientHeight - (padding * 2) - resizeHandleHeight - resizeHandleMargin;
+      // Maximum: expand until ChartControl is visible at top, leaving only min table height
       const maxChartHeight = availableHeight - minTableHeight;
+      const minChartHeightActual = Math.min(minChartHeight, maxChartHeight);
 
-      const newChartHeight = Math.max(minChartHeight, Math.min(maxChartHeight, y));
+      const newChartHeight = Math.max(minChartHeightActual, Math.min(maxChartHeight, y));
       
       setChartHeight(newChartHeight);
     };
 
-    const handleMouseUp = () => {
-      isResizingRef.current = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+    const handleMouseUp = (e: MouseEvent) => {
+      if (isResizingRef.current) {
+        isResizingRef.current = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
     };
 
-    const handleMouseDown = () => {
-      isResizingRef.current = true;
-      document.body.style.cursor = 'row-resize';
-      document.body.style.userSelect = 'none';
-    };
-
-    const resizeHandle = resizeRef.current;
-    if (resizeHandle) {
-      resizeHandle.addEventListener('mousedown', handleMouseDown);
-    }
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    // Use capture phase to ensure we catch events early
+    document.addEventListener('mousemove', handleMouseMove, true);
+    document.addEventListener('mouseup', handleMouseUp, true);
+    document.addEventListener('mouseleave', handleMouseUp, true);
 
     return () => {
       resizeObserver.disconnect();
-      if (resizeHandle) {
-        resizeHandle.removeEventListener('mousedown', handleMouseDown);
-      }
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove, true);
+      document.removeEventListener('mouseup', handleMouseUp, true);
+      document.removeEventListener('mouseleave', handleMouseUp, true);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      isResizingRef.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -117,26 +136,43 @@ export default function ClientTradingPage({
         <TradeHeader baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
 
         <div className="flex-1 flex flex-col md:flex-row min-h-0">
-          <div ref={containerRef} className="w-full md:w-3/4 border-r border-border/20 flex flex-col p-4 min-h-0 gap-2" style={{ position: 'relative' }}>
-            <div className="min-h-0 overflow-hidden" style={{ height: chartHeight ? `${chartHeight}px` : '66%', minHeight: '200px' }}>
+          <div ref={containerRef} className="w-full md:w-3/4 border-r border-border/20 flex flex-col p-4 min-h-0" style={{ position: 'relative' }}>
+            <div className="flex-shrink-0 overflow-hidden" style={{ height: chartHeight ? `${chartHeight}px` : '66%', minHeight: '320px' }}>
               <ChartArea market={pair} />
             </div>
             
             {/* Resize Handle */}
             <div
               ref={resizeRef}
-              className="h-2 bg-border/30 hover:bg-border/60 cursor-row-resize transition-colors relative group flex items-center justify-center"
+              className="h-2 bg-border/30 hover:bg-border/60 cursor-row-resize transition-colors relative group flex items-center justify-center flex-shrink-0 my-1"
               style={{
-                marginTop: '-4px',
-                marginBottom: '-4px',
                 userSelect: 'none',
+                zIndex: 10,
+                touchAction: 'none',
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (containerRef.current) {
+                  isResizingRef.current = true;
+                  document.body.style.cursor = 'row-resize';
+                  document.body.style.userSelect = 'none';
+                  // Force a re-render to ensure handlers are active
+                  setChartHeight((prev) => prev || 400);
+                }
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                if (containerRef.current) {
+                  isResizingRef.current = true;
+                }
               }}
             >
-              <div className="h-1 w-20 bg-foreground/40 rounded-full group-hover:bg-foreground/60 transition-colors" />
+              <div className="h-1 w-20 bg-foreground/40 rounded-full group-hover:bg-foreground/60 transition-colors pointer-events-none" />
             </div>
 
-            <div className="min-h-0 overflow-hidden" style={{ flex: 1, minHeight: '150px' }}>
-              <BottomTable market={pair} />
+            <div className="flex-1 min-h-0 overflow-hidden" style={{ minHeight: '100px' }}>
+              <BottomTable market={pair} baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
             </div>
           </div>
 

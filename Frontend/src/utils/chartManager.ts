@@ -22,6 +22,8 @@ export class ChartManager {
     close: null,
     volume: null,
   };
+  private initialPrice: number | null = null;
+  private lastPrice: number | null = null;
 
   constructor(
     ref: HTMLDivElement,
@@ -85,19 +87,14 @@ export class ChartManager {
     });
     this.chart = chart;
 
-    // Price Series
+    // Price Series - will be set to green/red based on price trend
     this.priceSeries = chart.addSeries(LineSeries, {
-      color: '#2962FF', // Vibrant blue
+      color: '#26A69A', // Default green (will be updated based on trend)
       lineWidth: 2,
-      // priceLine: {
-      //   color: 'rgba(41, 98, 255, 0.5)',
-      //   lineWidth: 1,
-      //   lineStyle: 2, // dashed
-      // },
       crosshairMarkerVisible: true,
       crosshairMarkerRadius: 4,
-      crosshairMarkerBorderColor: 'rgba(41, 98, 255, 1)',
-      crosshairMarkerBackgroundColor: 'rgba(41, 98, 255, 1)',
+      crosshairMarkerBorderColor: 'rgba(38, 166, 154, 1)',
+      crosshairMarkerBackgroundColor: 'rgba(38, 166, 154, 1)',
     });
     this.priceSeries.priceScale().applyOptions({
       scaleMargins: {
@@ -136,6 +133,23 @@ export class ChartManager {
     const deduplicatedData = Array.from(uniqueDataMap.values()).sort(
       (a, b) => a.timestamp - b.timestamp
     );
+
+    // Determine overall trend for initial color (first price vs last price)
+    if (deduplicatedData.length > 0) {
+      this.initialPrice = deduplicatedData[0].close;
+      this.lastPrice = deduplicatedData[deduplicatedData.length - 1].close;
+      
+      // Update line color based on price trend (green for up, red for down)
+      const isPriceUp = this.lastPrice >= this.initialPrice;
+      const lineColor = isPriceUp ? '#26A69A' : '#EF5350'; // Green for up, Red for down
+      const markerColor = isPriceUp ? 'rgba(38, 166, 154, 1)' : 'rgba(239, 83, 80, 1)';
+      
+      this.priceSeries.applyOptions({
+        color: lineColor,
+        crosshairMarkerBorderColor: markerColor,
+        crosshairMarkerBackgroundColor: markerColor,
+      });
+    }
 
     // Set initial data
     const priceData = deduplicatedData.map((data) => ({
@@ -191,6 +205,31 @@ export class ChartManager {
     const timeInSeconds = Math.floor(updatedPrice.time / 1000) as UTCTimestamp;
 
     try {
+      // Determine price direction and update line color dynamically
+      if (this.currentBar.close !== null) {
+        const isPriceUp = updatedPrice.close >= this.currentBar.close;
+        const lineColor = isPriceUp ? '#26A69A' : '#EF5350'; // Green for up, Red for down
+        const markerColor = isPriceUp ? 'rgba(38, 166, 154, 1)' : 'rgba(239, 83, 80, 1)';
+        
+        // Update line color based on price movement
+        this.priceSeries.applyOptions({
+          color: lineColor,
+          crosshairMarkerBorderColor: markerColor,
+          crosshairMarkerBackgroundColor: markerColor,
+        });
+      } else if (this.initialPrice !== null) {
+        // Compare with initial price if no current bar
+        const isPriceUp = updatedPrice.close >= this.initialPrice;
+        const lineColor = isPriceUp ? '#26A69A' : '#EF5350';
+        const markerColor = isPriceUp ? 'rgba(38, 166, 154, 1)' : 'rgba(239, 83, 80, 1)';
+        
+        this.priceSeries.applyOptions({
+          color: lineColor,
+          crosshairMarkerBorderColor: markerColor,
+          crosshairMarkerBackgroundColor: markerColor,
+        });
+      }
+
       // Update price series
       this.priceSeries.update({
         time: timeInSeconds,
@@ -212,6 +251,9 @@ export class ChartManager {
         close: updatedPrice.close,
         volume: updatedPrice.volume,
       };
+      
+      // Track last price for trend calculation
+      this.lastPrice = updatedPrice.close;
 
       // Update lastUpdateTime for tracking
       this.lastUpdateTime = updatedPrice.time;

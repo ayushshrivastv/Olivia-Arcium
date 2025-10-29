@@ -4,17 +4,21 @@ import { useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import ChartControl from './ChartControl';
 import { ChartManager } from '@/src/utils/chartManager';
+import { MultiLineChartManager } from '@/src/utils/multiLineChartManager';
 import { KLine } from '@/src/utils/types';
 import { getKlines } from '@/src/utils/httpClient';
 import { useChartStore } from '@/src/utils/store/chartStore';
 
 export default function ChartArea({ market }: { market: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const managerRef = useRef<ChartManager | null>(null);
+  const managerRef = useRef<ChartManager | MultiLineChartManager | null>(null);
   const lastBarTsRef = useRef<number>(0);
   const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
 
   const { interval, view } = useChartStore();
+
+  // Check if this is the NYC Mayor election market
+  const isNYCMayorMarket = market.includes('NYC-MAYOR') || market === 'NYC-MAYOR';
 
   const toBar = (x: KLine) => {
     // Parse ISO date string or timestamp
@@ -40,6 +44,25 @@ export default function ChartArea({ market }: { market: string }) {
   const initializeChart = useCallback(async () => {
     if (!containerRef.current) return;
 
+    managerRef.current?.destroy();
+
+    // Use multi-line chart for NYC Mayor election
+    if (isNYCMayorMarket) {
+      const candidates = [
+        { name: 'Zohran Mamdani', percentage: 88.8, color: '#FF8C42' }, // Orange - ends at 88.8%
+        { name: 'Andrew Cuomo', percentage: 11.1, color: '#4285F4' }, // Blue - ends at 11.1%
+        { name: 'Curtis Sliwa', percentage: 0.8, color: '#9E9E9E' }, // Grey (<1%)
+        { name: 'Eric Adams', percentage: 0.5, color: '#FFEB3B' }, // Yellow (<1%)
+      ];
+
+      managerRef.current = new MultiLineChartManager(containerRef.current, candidates, {
+        background: '#0e0f14',
+        color: 'white',
+      });
+      return;
+    }
+
+    // Regular chart for other markets
     const now = Date.now();
     let startTime;
     switch (interval) {
@@ -74,8 +97,6 @@ export default function ChartArea({ market }: { market: string }) {
 
     const bars = klines.map(toBar).sort((a, b) => a.timestamp - b.timestamp);
 
-    managerRef.current?.destroy();
-
     managerRef.current = new ChartManager(containerRef.current, bars, {
       background: '#0e0f14',
       color: 'white',
@@ -83,11 +104,16 @@ export default function ChartArea({ market }: { market: string }) {
 
     lastBarTsRef.current =
       bars.length > 0 ? bars[bars.length - 1].timestamp : now;
-  }, [interval, market]);
+  }, [interval, market, isNYCMayorMarket]);
 
   const fetchLatestDataAndUpdate = useCallback(async () => {
     if (!managerRef.current) {
       console.log('Chart manager not initialized, skipping fetch.');
+      return;
+    }
+
+    // Skip updates for multi-line chart (NYC Mayor) - it's static
+    if (isNYCMayorMarket) {
       return;
     }
 
@@ -105,7 +131,7 @@ export default function ChartArea({ market }: { market: string }) {
       return;
     }
 
-    if (klines.length > 0) {
+    if (klines.length > 0 && managerRef.current instanceof ChartManager) {
       const newBars = klines
         .map(toBar)
         .sort((a, b) => a.timestamp - b.timestamp);
@@ -120,13 +146,13 @@ export default function ChartArea({ market }: { market: string }) {
         newCandleInitiated: isNewCandlePeriod,
       };
 
-      managerRef.current?.update(updateData);
+      managerRef.current.update(updateData);
 
       if (isNewCandlePeriod) {
         lastBarTsRef.current = latestBar.timestamp;
       }
     }
-  }, [interval, market]);
+  }, [interval, market, isNYCMayorMarket]);
 
   useEffect(() => {
     initializeChart();
@@ -156,9 +182,31 @@ export default function ChartArea({ market }: { market: string }) {
 
   const ChatArea = dynamic(() => import('@/src/trade/Chat/ChatArea'), { ssr: false });
 
+  const candidates = isNYCMayorMarket ? [
+    { name: 'Zohran Mamdani', percentage: 88.8, color: '#FF8C42' },
+    { name: 'Andrew Cuomo', percentage: 11.1, color: '#4285F4' },
+    { name: 'Curtis Sliwa', percentage: 0.8, color: '#9E9E9E' },
+    { name: 'Eric Adams', percentage: 0.5, color: '#FFEB3B' },
+  ] : [];
+
   return (
     <>
       <ChartControl />
+      {isNYCMayorMarket && (
+        <div className="flex items-center gap-4 px-4 py-2 border-b border-border/20 bg-background">
+          {candidates.map((candidate) => (
+            <div key={candidate.name} className="flex items-center gap-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: candidate.color }}
+              />
+              <span className="text-sm text-foreground">
+                {candidate.name} {candidate.percentage < 1 ? '<1%' : `${candidate.percentage.toFixed(1)}%`}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="flex-1 bg-card flex items-center justify-center">
         <div
           ref={containerRef}
