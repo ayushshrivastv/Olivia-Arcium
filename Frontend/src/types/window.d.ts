@@ -1,4 +1,5 @@
 // Extend the Window interface to include Solana wallets
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Window {
   solana?: {
     isPhantom?: boolean;

@@ -3,7 +3,6 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { IconWallet } from '@tabler/icons-react';
-import { PublicKey } from '@solana/web3.js';
 import { useState, useEffect } from 'react';
 
 export function WalletButton() {
@@ -14,11 +13,6 @@ export function WalletButton() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  const getShortAddress = (publicKey: PublicKey) => {
-    const address = publicKey.toString();
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  };
 
   const handleDisconnect = async () => {
     try {

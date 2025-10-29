@@ -205,23 +205,29 @@ export async function getTickers(): Promise<Market[]> {
   return MOCK_MARKETS;
 }
 
-export async function getDepth(market: string): Promise<Depth> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function getDepth(_market: string): Promise<Depth> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 100));
   return MOCK_DEPTH;
 }
 
-export async function getTrades(market: string): Promise<TradesResponse> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function getTrades(_market: string): Promise<TradesResponse> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 100));
   return MOCK_TRADES;
 }
 
 export async function getKlines(
-  market: string,
-  interval: string,
-  startTime: string,
-  endTime: string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _market: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _interval: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _startTime: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _endTime: string
 ): Promise<KLine[]> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 100));

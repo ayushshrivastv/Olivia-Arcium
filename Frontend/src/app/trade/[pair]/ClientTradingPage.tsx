@@ -55,7 +55,6 @@ export default function ClientTradingPage({
       const minTableHeight = 150;
       const availableHeight = container.clientHeight - (padding * 2) - gap;
       const maxChartHeight = availableHeight - minTableHeight;
-      const maxTableHeight = availableHeight - minChartHeight;
 
       const newChartHeight = Math.max(minChartHeight, Math.min(maxChartHeight, y));
       

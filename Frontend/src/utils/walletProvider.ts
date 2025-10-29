@@ -1,5 +1,6 @@
-import { Connection, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
+import { PublicKey, Transaction } from '@solana/web3.js';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface WalletProvider {
   name: string;
   icon?: string;
