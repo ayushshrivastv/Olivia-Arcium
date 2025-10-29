@@ -15,6 +15,7 @@ export default function TradeHeader({
   baseCurrency,
   quoteCurrency,
 }: TradeHeaderProps) {
+  const isNYCMayorMarket = baseCurrency.includes('NYC-MAYOR') || baseCurrency === 'NYC-MAYOR';
   const [name, setName] = useState<string>();
   const [price, setPrice] = useState<string>('');
   const [priceChange, setPriceChange] = useState<number>(0);
@@ -76,7 +77,9 @@ export default function TradeHeader({
         <div className="flex items-center">
           <div>
             <div className="text-xl font-bold">
-              {(parseFloat(price) * 100).toFixed(2)}%
+              {isNYCMayorMarket 
+                ? '88.8%' // Zohran Mamdani's percentage for NYC Mayor market
+                : `${(parseFloat(price) * 100).toFixed(2)}%`}
             </div>
 
             <div className="text-xs text-green-500">${priceChange}</div>

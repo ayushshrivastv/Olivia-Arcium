@@ -1,4 +1,9 @@
-export const NoTable = ({ asks }: { asks: [string, string][] }) => {
+interface NoTableProps {
+  asks: [string, string][];
+  isNYCMayorMarket?: boolean;
+}
+
+export const NoTable = ({ asks, isNYCMayorMarket = false }: NoTableProps) => {
   const relevantAsks = asks.slice(0, 30);
   let currentTotal = 0;
 
@@ -21,6 +26,7 @@ export const NoTable = ({ asks }: { asks: [string, string][] }) => {
           price={price}
           quantity={quantity}
           total={total}
+          isNYCMayorMarket={isNYCMayorMarket}
         />
       ))}
     </div>
@@ -32,11 +38,13 @@ function No({
   quantity,
   total,
   maxTotal,
+  isNYCMayorMarket = false,
 }: {
   price: string;
   quantity: string;
   total: number;
   maxTotal: number;
+  isNYCMayorMarket?: boolean;
 }) {
   return (
     <div
@@ -65,7 +73,11 @@ function No({
       ></div>
       <div className="flex justify-between text-sm w-full px-2">
         <div>{quantity}</div>
-        <div className="">{Number(price).toFixed(5)}</div>
+        <div className="">
+          {isNYCMayorMarket 
+            ? `${(Number(price) * 100).toFixed(1)}%`
+            : Number(price).toFixed(5)}
+        </div>
       </div>
     </div>
   );

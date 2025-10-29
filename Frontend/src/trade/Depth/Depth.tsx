@@ -5,7 +5,7 @@ import { NoTable } from './NoTable';
 import { YesTable } from './YesTable';
 import { SignalingManager } from '@/src/utils/SignalingManager';
 
-export default function Depth({ market }: { market: string }) {
+export default function Depth({ market, isNYCMayorMarket = false }: { market: string; isNYCMayorMarket?: boolean }) {
   const [bids, setBids] = useState<[string, string][]>([]);
   const [asks, setAsks] = useState<[string, string][]>([]);
   const room = `depth@${market}` as const;
@@ -42,49 +42,53 @@ export default function Depth({ market }: { market: string }) {
   }, [market, room]);
 
   return (
-    <div className="flex flex-col h-full border-t border-border/20 pt-2">
-      <div className="sticky top-0 bg-background z-20 py-1 px-2">
-        <TableHeader />
+    <div className="flex flex-col w-full">
+      <div className="pt-2 px-2">
+        <TableHeader isNYCMayorMarket={isNYCMayorMarket} />
       </div>
-      <div className="flex flex-grow overflow-hidden">
-        <div className="w-1/2 pr-1 flex flex-col">
-          {asks && (
-            <div className="flex-grow overflow-y-auto">
-              <NoTable asks={asks.slice(0, 50)} />
-            </div>
-          )}
+      <div className="flex mt-2">
+        <div className="w-1/2 pr-1">
+          {asks && <NoTable asks={asks.slice(0, 50)} isNYCMayorMarket={isNYCMayorMarket} />}
         </div>
-        <div className="w-1/2 pl-1 flex flex-col">
-          {bids && (
-            <div className="flex-grow overflow-y-auto">
-              <YesTable bids={bids.slice(0, 50)} />
-            </div>
-          )}
+        <div className="w-1/2 pl-1">
+          {bids && <YesTable bids={bids.slice(0, 50)} isNYCMayorMarket={isNYCMayorMarket} />}
         </div>
       </div>
     </div>
   );
 }
 
-function TableHeader() {
-  return (
-    <>
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-red-800 mr-1" /> No
+function TableHeader({ isNYCMayorMarket }: { isNYCMayorMarket: boolean }) {
+  if (isNYCMayorMarket) {
+    const candidates = [
+      { name: 'Zohran Mamdani', percentage: 88.8 },
+      { name: 'Andrew Cuomo', percentage: 11.1 },
+      { name: 'Curtis Sliwa', percentage: 0.8 },
+      { name: 'Eric Adams', percentage: 0.5 },
+    ];
+
+    return (
+      <div className="flex flex-col gap-1 pb-2">
+        {candidates.map((candidate) => (
+          <div key={candidate.name} className="flex justify-between text-xs text-muted-foreground">
+            <span>{candidate.name}</span>
+            <span>{candidate.percentage < 1 ? '<1%' : `${candidate.percentage.toFixed(1)}%`}</span>
           </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-green-800 mr-1" /> Yes
-          </div>
+        ))}
+        <div className="flex text-xs text-muted-foreground border-t border-border/20 pt-2 mt-1">
+          <div className="w-1/3 text-left">No</div>
+          <div className="w-1/3 text-center">Yes</div>
+          <div className="w-1/3 text-right">Size</div>
         </div>
       </div>
-      <div className="flex text-xs text-muted-foreground mb-2">
-        <div className="flex-grow text-left">Size</div>
-        <div className="flex-grow text-center">No</div>
-        <div className="flex-grow text-center">Yes</div>
-        <div className="flex-grow text-right">Size</div>
-      </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="flex text-xs text-muted-foreground border-b border-border/20 pb-2">
+      <div className="w-1/3 text-left">No</div>
+      <div className="w-1/3 text-center">Yes</div>
+      <div className="w-1/3 text-right">Size</div>
+    </div>
   );
 }

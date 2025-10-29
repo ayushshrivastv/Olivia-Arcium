@@ -6,6 +6,7 @@ import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';
 import { ArrowDownIcon } from '@/src/components/Icons';
 import { Loader2 } from 'lucide-react';
+import Depth from '@/src/trade/Depth/Depth';
 
 interface SwapUIProps {
   baseCurrency: string;
@@ -49,6 +50,17 @@ interface QuotePayload {
 }
 
 export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
+  const isNYCMayorMarket = baseCurrency.includes('NYC-MAYOR') || baseCurrency === 'NYC-MAYOR';
+  const candidates = isNYCMayorMarket ? [
+    'Zohran Mamdani',
+    'Andrew Cuomo',
+    'Curtis Sliwa',
+    'Eric Adams',
+  ] : [];
+  
+  const market = `${baseCurrency.replace(/_+$/, '')}_${quoteCurrency}`;
+  
+  const [selectedCandidate, setSelectedCandidate] = useState<string>(candidates[0] || '');
   const [orderType, setOrderType] = useState<OrderType>('BUY');
   const [orderMode, setOrderMode] = useState<OrderMode>('MKT');
   const [limitPrice, setLimitPrice] = useState<string>('');
@@ -57,8 +69,6 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [orderResult, setOrderResult] = useState<OrderResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const market = `${baseCurrency.replace(/_+$/, '')}_${quoteCurrency}`;
 
   const sideMapping = useMemo<Record<OrderType, string>>(
     () => ({ BUY: 'Bid', SELL: 'Ask' }),
@@ -165,28 +175,72 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       <div className="flex-shrink-0">
-        <div className="flex mb-4">
-          <Button
-            className={`flex-1 ${
-              orderType === 'BUY'
-                ? 'bg-white text-green-500'
-                : 'bg-card hover:bg-card/90 text-green-500'
-            } rounded-l-xl rounded-r-none border border-border font-semibold`}
-            onClick={() => handleOrderTypeChange('BUY')}
-          >
-            BUY
-          </Button>
-          <Button
-            className={`flex-1 ${
-              orderType === 'SELL'
-                ? 'bg-white text-red-500'
-                : 'bg-card hover:bg-card/90 text-red-500'
-            } rounded-r-xl rounded-l-none border border-l-0 border-border font-semibold`}
-            onClick={() => handleOrderTypeChange('SELL')}
-          >
-            SELL
-          </Button>
-        </div>
+        {isNYCMayorMarket && candidates.length > 0 ? (
+          <div className="mb-4">
+            <div className="text-sm mb-2 text-muted-foreground">Select Candidate:</div>
+            <div 
+              className="flex gap-2 overflow-x-auto pb-2"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(255, 255, 255, 0.1) transparent',
+              }}
+            >
+              {candidates.map((candidate) => (
+                <button
+                  key={candidate}
+                  onClick={() => setSelectedCandidate(candidate)}
+                  className={`rounded-full px-4 py-2 text-sm transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
+                    selectedCandidate === candidate
+                      ? 'text-white'
+                      : 'text-muted-foreground'
+                  }`}
+                  style={{
+                    backgroundColor: selectedCandidate === candidate
+                      ? 'rgba(255, 255, 255, 0.1)'
+                      : 'rgba(10, 10, 10, 0.7)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedCandidate !== candidate) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedCandidate !== candidate) {
+                      e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.7)';
+                    }
+                  }}
+                >
+                  {candidate}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex mb-4">
+            <Button
+              className={`flex-1 ${
+                orderType === 'BUY'
+                  ? 'bg-white text-green-500'
+                  : 'bg-card hover:bg-card/90 text-green-500'
+              } rounded-l-xl rounded-r-none border border-border font-semibold`}
+              onClick={() => handleOrderTypeChange('BUY')}
+            >
+              BUY
+            </Button>
+            <Button
+              className={`flex-1 ${
+                orderType === 'SELL'
+                  ? 'bg-white text-red-500'
+                  : 'bg-card hover:bg-card/90 text-red-500'
+              } rounded-r-xl rounded-l-none border border-l-0 border-border font-semibold`}
+              onClick={() => handleOrderTypeChange('SELL')}
+            >
+              SELL
+            </Button>
+          </div>
+        )}
 
         <div className="flex mb-4">
           <Button
@@ -197,7 +251,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
             } rounded-l-xl rounded-r-none border border-border`}
             onClick={() => handleOrderModeChange('MKT')}
           >
-            MKT
+            Buy
           </Button>
           <Button
             className={`flex-1 ${
@@ -207,7 +261,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
             } rounded-r-xl rounded-l-none border border-l-0 border-border`}
             onClick={() => handleOrderModeChange('LIMIT')}
           >
-            LIMIT
+            Sell
           </Button>
         </div>
       </div>
@@ -235,22 +289,40 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
         <div className="flex justify-between items-center text-sm mb-2">
           <span>Amount:</span>
           <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-muted-foreground hover:text-foreground px-2 h-6"
+            <button
+              className="rounded-full px-3 py-1.5 text-sm transition-all duration-200 text-white"
+              style={{
+                backgroundColor: 'rgba(10, 10, 10, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.7)';
+              }}
               onClick={() => applyMultiplier(0.5)}
             >
               .5x
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-muted-foreground hover:text-foreground px-2 h-6"
+            </button>
+            <button
+              className="rounded-full px-3 py-1.5 text-sm transition-all duration-200 text-white"
+              style={{
+                backgroundColor: 'rgba(10, 10, 10, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.7)';
+              }}
               onClick={() => applyMultiplier(2)}
             >
               2x
-            </Button>
+            </button>
           </div>
         </div>
         <div className="flex">
@@ -262,10 +334,23 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
             type="number"
             step="0.01"
           />
-          <Button className="bg-secondary hover:bg-secondary/90 border border-border rounded-l-none text-white">
+          <button
+            className="rounded-l-none rounded-r-md px-4 py-2 text-sm transition-all duration-200 text-white flex items-center gap-2"
+            style={{
+              backgroundColor: 'rgba(10, 10, 10, 0.7)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.7)';
+            }}
+          >
             SOLANA
-            <ArrowDownIcon className="h-4 w-4 ml-2" />
-          </Button>
+            <ArrowDownIcon className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
@@ -318,9 +403,20 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
               Processing...
             </>
           ) : (
-            `${orderType} ${baseCurrency.replace(/_+$/, '')}`
+            isNYCMayorMarket && selectedCandidate
+              ? orderType === 'BUY'
+                ? `Bet on ${selectedCandidate}`
+                : `Sell ${selectedCandidate}`
+              : `${orderType} ${baseCurrency.replace(/_+$/, '')}`
           )}
         </Button>
+      </div>
+
+      {/* Depth Table Section - Scrollable */}
+      <div className="flex-shrink-0 mt-4 border-t border-border/20 pt-4">
+        <div className="h-64 overflow-y-auto">
+          <Depth market={market} isNYCMayorMarket={isNYCMayorMarket} />
+        </div>
       </div>
     </div>
   );

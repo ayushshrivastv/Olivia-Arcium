@@ -177,13 +177,8 @@ export default function ClientTradingPage({
           </div>
 
           <div className="w-full md:w-2/6 border-t md:border-t-0 border-border/20 flex flex-col h-full min-h-0">
-            <div className="flex flex-col flex-grow h-full overflow-hidden p-4 min-h-0 gap-4">
-              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                <SwapUI baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
-              </div>
-              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                <Depth market={pair} />
-              </div>
+            <div className="flex flex-col flex-grow h-full overflow-hidden p-4 min-h-0">
+              <SwapUI baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
             </div>
           </div>
         </div>
