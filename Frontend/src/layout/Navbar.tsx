@@ -1,7 +1,8 @@
 'use client';
 
 import { FloatingNav } from '@/src/ui/FloatingNavbar';
-import { IconCurrencyBitcoin, IconTrophy, IconBook, IconNews, IconWallet, IconHome } from '@tabler/icons-react';
+import { IconCurrencyBitcoin, IconTrophy, IconBook, IconNews, IconHome } from '@tabler/icons-react';
+import { WalletButton } from '@/src/components/WalletButton';
 
 export function Navbar() {
   const navItems = [
@@ -35,28 +36,7 @@ export function Navbar() {
   return (
     <>
       <FloatingNav navItems={navItems} />
-      <div className="fixed top-10 right-10 z-50">
-        <button
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all duration-200"
-          style={{
-            backgroundColor: 'rgba(10, 10, 10, 0.7)',
-            border: '1px solid rgba(85, 34, 224, 0.5)',
-            backdropFilter: 'blur(10px)',
-            color: 'white',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(85, 34, 224, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(85, 34, 224, 1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.7)';
-            e.currentTarget.style.borderColor = 'rgba(85, 34, 224, 0.5)';
-          }}
-        >
-          <IconWallet className="h-4 w-4" />
-          <span>Connect Wallet</span>
-        </button>
-      </div>
+      <WalletButton />
     </>
   );
 }
