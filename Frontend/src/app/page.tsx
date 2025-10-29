@@ -7,8 +7,11 @@ import HomeBanner from '../home/HomeBanner';
 export default function Home() {
   return (
     <MainLayout>
+      {/* Fixed dark background to prevent white flash on refresh */}
+      <div className="fixed inset-0 bg-[#0a0a0a]" style={{ zIndex: 0 }} />
+      
       {/* Dither background - only on landing page */}
-      <div className="fixed inset-0" style={{ zIndex: 0 }}>
+      <div className="fixed inset-0" style={{ zIndex: 1 }}>
         <Dither
           waveColor={[0.3, 0.3, 0.3]}
           disableAnimation={false}
