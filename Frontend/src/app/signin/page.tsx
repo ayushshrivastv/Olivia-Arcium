@@ -15,9 +15,7 @@ export default function SignInPage() {
             tabIndex={-1}
             title="Olivia | Privacy-First Prediction Markets"
           >
-            <Link href="/" passHref className="flex items-center">
-              <Image src={'/logo.png'} height={54} width={54} alt={'logo'} />
-            </Link>
+            <Image src={'/logo.png'} height={54} width={54} alt={'logo'} />
           </Link>
         </nav>
       </header>
