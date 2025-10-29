@@ -83,14 +83,6 @@ export default function TradeHeader({
           </div>
         </div>
       </div>
-      <div className="flex items-center space-x-6">
-        <div className="flex gap-6 text-sm">
-          <div>
-            <div className="text-muted-foreground">Balance(USDC)</div>
-            <div className="font-medium">$10_000</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -94,7 +94,7 @@ export default function ClientTradingPage({
   }, []);
 
   return (
-    <MainLayout showFooter={false} showSocialIcons={false}>
+    <MainLayout showFooter={false} showSocialIcons={false} showLogo={false}>
       {/* Arcium Logo - positioned below wallet button */}
       <div className="fixed top-28 right-10 z-50 flex items-center gap-2">
         <Image 

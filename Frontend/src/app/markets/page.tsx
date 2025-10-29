@@ -1,9 +1,14 @@
+'use client';
+
+import { useState } from 'react';
 import { MainLayout } from '../../layout/Layout';
 import MarketsGrid from '../../market/MarketsGrid';
 
 export default function Markets() {
+  const [hideNavbar, setHideNavbar] = useState(false);
+
   return (
-    <MainLayout>
+    <MainLayout hideNavbar={hideNavbar}>
       {/* Full viewport dark background */}
       <div className="fixed inset-0 bg-[#0a0a0a]" style={{ zIndex: 0 }} />
       
@@ -17,7 +22,7 @@ export default function Markets() {
               Choose a market to start predicting and earning rewards
             </p>
           </div>
-          <MarketsGrid />
+          <MarketsGrid onFormToggle={setHideNavbar} />
         </div>
       </div>
     </MainLayout>

@@ -10,13 +10,34 @@ interface MainLayoutProps {
   children: React.ReactNode;
   showFooter?: boolean;
   showSocialIcons?: boolean;
+  showLogo?: boolean;
+  hideNavbar?: boolean;
 }
 
-export function MainLayout({ children, showFooter = true, showSocialIcons = true }: MainLayoutProps) {
+export function MainLayout({ children, showFooter = true, showSocialIcons = true, showLogo = true, hideNavbar = false }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col mx-auto max-w-7xl text-white" style={{ background: 'transparent', position: 'relative', zIndex: 10 }}>
-      <Navbar />
-      <main className="flex-1 w-full bg-transparent" style={{ marginTop: '80px' }}>
+      {/* Arcium Logo - Top Left Corner */}
+      {showLogo && !hideNavbar && (
+        <div className="fixed top-10 left-10 z-50 flex items-center gap-2">
+          <Image 
+            src="/Arcium Icon.png" 
+            alt="Arcium Icon" 
+            width={32} 
+            height={32}
+            className="object-contain"
+          />
+          <Image 
+            src="/Arcium logo.png" 
+            alt="Arcium Logo" 
+            width={120} 
+            height={32}
+            className="object-contain"
+          />
+        </div>
+      )}
+      {!hideNavbar && <Navbar />}
+      <main className="flex-1 w-full bg-transparent" style={{ marginTop: hideNavbar ? '0px' : '80px' }}>
         {children}
       </main>
       {/* Social Media Links - Bottom Right Corner */}

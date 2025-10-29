@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { CometCard } from '@/src/ui/CometCard';
+import { Input } from '@/src/ui/Input';
+import { Button } from '@/src/ui/Button';
+import { X } from 'lucide-react';
 
 interface MarketItem {
   id: string;
@@ -79,9 +82,23 @@ const mockMarkets: MarketItem[] = [
   }
 ];
 
-export default function MarketsGrid() {
+interface MarketsGridProps {
+  onFormToggle?: (isOpen: boolean) => void;
+}
+
+export default function MarketsGrid({ onFormToggle }: MarketsGridProps = {}) {
   const [markets, setMarkets] = useState<MarketItem[]>(mockMarkets);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    question: '',
+    category: '',
+    startDate: '',
+    endDate: '',
+    imageUrl: '',
+  });
 
   useEffect(() => {
     if (searchQuery) {
@@ -95,11 +112,52 @@ export default function MarketsGrid() {
     }
   }, [searchQuery]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowCreateForm(false);
+    onFormToggle?.(false);
+    setShowComingSoon(true);
+    // Reset form
+    setFormData({
+      name: '',
+      question: '',
+      category: '',
+      startDate: '',
+      endDate: '',
+      imageUrl: '',
+    });
+    // Hide message after 3 seconds
+    setTimeout(() => setShowComingSoon(false), 3000);
+  };
+
+  const handleClose = () => {
+    setShowCreateForm(false);
+    onFormToggle?.(false);
+    setFormData({
+      name: '',
+      question: '',
+      category: '',
+      startDate: '',
+      endDate: '',
+      imageUrl: '',
+    });
+  };
+
+  const handleOpenForm = () => {
+    setShowCreateForm(true);
+    onFormToggle?.(true);
+  };
+
   return (
     <div>
-      {/* Search Bar */}
-      <div className="mb-8">
-        <div className="relative max-w-md">
+      {/* Search Bar and Create Market Button */}
+      <div className="mb-8 flex items-center gap-4">
+        <div className="relative max-w-md flex-1">
           <input
             type="text"
             placeholder="Search markets..."
@@ -114,7 +172,209 @@ export default function MarketsGrid() {
             }}
           />
         </div>
+        <button
+          onClick={handleOpenForm}
+          className="rounded-full px-4 py-2 text-sm transition-all duration-200 cursor-pointer hover:opacity-80 whitespace-nowrap"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            color: 'white',
+          }}
+        >
+          Create Market
+        </button>
       </div>
+
+      {/* Coming Soon Message */}
+      {showComingSoon && (
+        <div
+          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-4 rounded-xl transition-all duration-300"
+          style={{
+            backgroundColor: 'rgba(10, 10, 10, 0.95)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            color: 'white',
+            zIndex: 10000,
+          }}
+        >
+          <p className="text-lg font-medium">Features coming soon</p>
+        </div>
+      )}
+
+      {/* Create Market Form Modal */}
+      {showCreateForm && (
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 9999 }}
+          onClick={handleClose}
+        >
+          <div
+            className="w-full max-w-2xl rounded-xl p-6 max-h-[90vh] overflow-y-auto"
+            style={{
+              backgroundColor: 'rgba(10, 10, 10, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-white">Create New Market</h2>
+              <button
+                onClick={handleClose}
+                className="text-white hover:opacity-70 transition-opacity"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Market Name */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Market Name *
+                </label>
+                <Input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="e.g., NYC Mayoral Election"
+                  required
+                  className="bg-card border-border text-white"
+                />
+              </div>
+
+              {/* Market Question/Description */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Market Question *
+                </label>
+                <Input
+                  type="text"
+                  name="question"
+                  value={formData.question}
+                  onChange={handleInputChange}
+                  placeholder="e.g., Who will win the election?"
+                  required
+                  className="bg-card border-border text-white"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Category *
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 rounded-md text-white text-sm bg-card border border-border focus:ring-2 focus:ring-ring focus:ring-offset-0 outline-none"
+                  style={{
+                    backgroundColor: 'rgba(10, 10, 10, 0.7)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  }}
+                >
+                  <option value="">Select a category</option>
+                  <option value="Politics">Politics</option>
+                  <option value="Sports">Sports</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Economics">Economics</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Start Date *
+                  </label>
+                  <Input
+                    type="date"
+                    name="startDate"
+                    value={formData.startDate}
+                    onChange={handleInputChange}
+                    required
+                    className="bg-card border-border text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    End Date *
+                  </label>
+                  <Input
+                    type="date"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleInputChange}
+                    required
+                    className="bg-card border-border text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Image URL */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Market Image URL
+                </label>
+                <Input
+                  type="url"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-card border-border text-white"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Optional: URL for the market image
+                </p>
+              </div>
+
+              {/* USDC Requirement Notice */}
+              <div className="border-t border-white/10 pt-4 mt-4">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <p className="text-sm text-white mb-2">
+                    <span className="font-semibold">Market Creation Fee: 20 USDC</span>
+                  </p>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    A deposit of 20 USDC is required to create a market. This ensures quality markets and prevents spam. 
+                    Your deposit will be fully returned after the event period ends, regardless of market outcome.
+                  </p>
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  className="border-white/20 text-white hover:bg-white/10"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="rounded-full px-4 py-2 text-sm transition-all duration-200"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                    color: 'white',
+                  }}
+                >
+                  Create Market
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Markets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

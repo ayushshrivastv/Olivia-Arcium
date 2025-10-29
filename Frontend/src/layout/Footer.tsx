@@ -42,9 +42,15 @@ export function Footer() {
 
         </div>
 
-        <div className="flex justify-center items-center pt-6 border-t border-border/10">
+        <div className="flex flex-col justify-center items-center pt-6 border-t border-border/10 gap-3">
+          <div className="text-xs text-gray-400 text-center max-w-3xl px-4" style={{ textShadow: '0 0 10px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,1), 1px 1px 4px rgba(0,0,0,1)' }}>
+            <p>
+              This project is not affiliated with, endorsed by, or connected to Arcium. 
+              Olivia uses Arcium technology for privacy-preserving prediction markets.
+            </p>
+          </div>
           <div className="text-sm text-white" style={{ textShadow: '0 0 10px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,1), 1px 1px 4px rgba(0,0,0,1)', WebkitTextStroke: '0.3px rgba(0,0,0,0.9)' }}>
-            © 2025 Olivia Markets, All rights reserved.
+            © 2025 Ayush Srivastava, All rights reserved.
           </div>
         </div>
       </div>

@@ -11,11 +11,12 @@ export default function SignInPage() {
         <nav className="flex items-center justify-between" aria-label="Global">
           <Link
             href="/"
-            className="flex items-center"
+            className="flex items-center gap-2"
             tabIndex={-1}
             title="Olivia | Privacy-First Prediction Markets"
           >
-            <Image src={'/logo.png'} height={54} width={54} alt={'logo'} />
+            <Image src={'/Arcium Icon.png'} height={32} width={32} alt={'Arcium Icon'} />
+            <Image src={'/Arcium logo.png'} height={32} width={120} alt={'Arcium Logo'} />
           </Link>
         </nav>
       </header>
@@ -34,7 +35,11 @@ export default function SignInPage() {
 
                 <div className="grid w-full">
                   <button
-                    className="py-4 justify-center items-center border whitespace-nowrap outline-none rounded-2xl border-border transition-all duration-250 hover:opacity-90 bg-primary text-primary-foreground"
+                    className="py-4 justify-center items-center border whitespace-nowrap outline-none rounded-2xl border-border transition-all duration-250 hover:opacity-90 text-white font-medium"
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                    }}
                     onClick={async () => {
                       await signIn('credentials', {
                         callbackUrl: '/',
