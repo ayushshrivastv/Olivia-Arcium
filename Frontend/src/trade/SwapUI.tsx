@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, ChangeEvent, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import axios from 'axios';
 import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';
@@ -166,6 +167,24 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const session = useSession();
   return (
     <>
+      {/* Arcium Logo and Icon */}
+      <div className="flex items-center gap-2 mb-6 justify-center">
+        <Image 
+          src="/Arcium Icon.png" 
+          alt="Arcium Icon" 
+          width={32} 
+          height={32}
+          className="object-contain"
+        />
+        <Image 
+          src="/Arcium logo.png" 
+          alt="Arcium Logo" 
+          width={120} 
+          height={32}
+          className="object-contain"
+        />
+      </div>
+
       <div className="flex mb-4">
         <Button
           className={`flex-1 ${
