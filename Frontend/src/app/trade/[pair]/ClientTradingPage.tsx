@@ -22,11 +22,11 @@ export default function ClientTradingPage({
         <TradeHeader baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
 
         <div className="flex-1 flex flex-col md:flex-row min-h-0">
-          <div className="w-full md:w-3/4 border-r border-border/20 flex flex-col p-4 min-h-0">
-            <div className="flex-1 min-h-0">
+          <div className="w-full md:w-3/4 border-r border-border/20 flex flex-col p-4 min-h-0 gap-2">
+            <div className="flex-[2] min-h-0" style={{ minHeight: '200px' }}>
               <ChartArea market={pair} />
             </div>
-            <div className="h-1/3 min-h-0">
+            <div className="flex-[1] min-h-0 overflow-hidden" style={{ minHeight: '150px', flexGrow: 1, flexShrink: 0 }}>
               <BottomTable market={pair} />
             </div>
           </div>

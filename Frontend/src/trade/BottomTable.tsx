@@ -75,14 +75,15 @@ export default function BottomTable({ market }: { market: string }) {
   }, [market, room, fetchTrades]);
 
   return (
-    <div className="h-48 border-t border-border/20">
+    <div className="h-full border-t border-border/20 flex flex-col min-h-0">
       <Tabs
         defaultValue="trade"
         onValueChange={(value) => {
           if (value === 'trade') fetchTrades();
         }}
+        className="flex flex-col h-full min-h-0"
       >
-        <div className="border-b border-border/20 sticky top-0 bg-background z-10">
+        <div className="border-b border-border/20 flex-shrink-0 bg-background z-10">
           <TabsList className="bg-background border-b border-border/20 rounded-none">
             <TabsTrigger
               value="trade"
@@ -111,7 +112,7 @@ export default function BottomTable({ market }: { market: string }) {
           </TabsList>
         </div>
 
-        <TabsContent value="trade" className="p-2">
+        <TabsContent value="trade" className="p-2 flex-1 min-h-0 flex flex-col">
           {loading ? (
             <div className="flex justify-center items-center h-12">
               <div className="text-sm text-muted-foreground">
@@ -129,11 +130,11 @@ export default function BottomTable({ market }: { market: string }) {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col h-36">
-              <div className="sticky top-0 bg-background z-10">
+            <div className="flex flex-col h-full min-h-0">
+              <div className="flex-shrink-0 bg-background z-10 border-b border-border/10">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-xs text-muted-foreground border-b border-border/10">
+                    <tr className="text-xs text-muted-foreground">
                       <th className="text-left py-2">Price</th>
                       <th className="text-left py-2">Quantity</th>
                       <th className="text-left py-2">Currency</th>
@@ -142,7 +143,7 @@ export default function BottomTable({ market }: { market: string }) {
                   </thead>
                 </table>
               </div>
-              <div className="overflow-y-auto flex-grow">
+              <div className="overflow-y-auto flex-1 min-h-0">
                 <table className="w-full text-sm">
                   <tbody>
                     {trades.map((trade, index) => (
