@@ -263,7 +263,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
             step="0.01"
           />
           <Button className="bg-secondary hover:bg-secondary/90 border border-border rounded-l-none">
-            {baseCurrency.replace(/_+$/, '')}
+            SOLANA
             <ArrowDownIcon className="h-4 w-4 ml-2" />
           </Button>
         </div>
