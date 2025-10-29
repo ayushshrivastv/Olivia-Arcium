@@ -20,6 +20,23 @@ const nextConfig: NextConfig = {
       '.mjs': ['.mjs', '.mts'],
     };
     
+    // Suppress warnings for optional dependencies (like pino-pretty from WalletConnect)
+    // pino-pretty is an optional dependency for pino, only needed for pretty-printing logs (dev only)
+    // Tell webpack to ignore this missing optional dependency
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'pino-pretty': false,
+    };
+    
+    // Ignore the specific warning about pino-pretty
+    if (!config.ignoreWarnings) {
+      config.ignoreWarnings = [];
+    }
+    config.ignoreWarnings.push({
+      module: /node_modules\/pino/,
+      message: /Can't resolve 'pino-pretty'/,
+    });
+    
     // Make sure node_modules are transpiled if needed
     if (!isServer) {
       config.resolve.fallback = {
