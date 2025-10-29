@@ -4,11 +4,16 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { IconWallet } from '@tabler/icons-react';
 import { PublicKey } from '@solana/web3.js';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function WalletButton() {
   const { wallet, publicKey, connected, disconnect } = useWallet();
   const [showDisconnect, setShowDisconnect] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const getShortAddress = (publicKey: PublicKey) => {
     const address = publicKey.toString();
@@ -26,7 +31,26 @@ export function WalletButton() {
 
   return (
     <div className="fixed top-10 right-10 z-50 flex flex-col gap-2">
-      {connected && publicKey ? (
+      {!isMounted ? (
+        // Show a placeholder during SSR to prevent hydration mismatch
+        <div 
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            color: 'white',
+            borderRadius: '9999px',
+            padding: '8px 16px',
+            fontSize: '14px',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+          }}
+        >
+          <IconWallet className="h-4 w-4" />
+          <span>Connect Wallet</span>
+        </div>
+      ) : connected && publicKey ? (
         <div className="flex flex-col gap-2">
           <div 
             className="flex items-center gap-2 px-4 py-2 rounded-full text-sm cursor-pointer hover:opacity-80 transition-all"
