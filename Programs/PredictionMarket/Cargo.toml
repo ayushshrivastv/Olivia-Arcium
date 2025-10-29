@@ -16,6 +16,12 @@ no-idl = []
 no-log-ix-name = []
 idl-build = ["anchor-lang/idl-build"]
 
+[lints.rust]
+# Suppress warnings about unexpected cfg conditions from Solana/Anchor macros
+unexpected_cfgs = "allow"
+# Suppress deprecation warnings from anchor_lang macros (using deprecated realloc internally)
+deprecated = "allow"
+
 [dependencies]
 anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
 

@@ -8,6 +8,12 @@ anchor-lang = "0.31.1"
 [patch.crates-io]
 proc-macro2 = { git = 'https://github.com/arcium-hq/proc-macro2.git' }
 
+[workspace.lints.rust]
+# Suppress warnings about unexpected cfg conditions from Solana/Anchor macros
+unexpected_cfgs = "allow"
+# Suppress deprecation warnings from anchor_lang macros (using deprecated realloc internally)
+deprecated = "allow"
+
 [profile.release]
 overflow-checks = true
 lto = "fat"

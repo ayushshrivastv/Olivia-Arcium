@@ -7,7 +7,6 @@
 
 use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
-use arcium_client::idl::arcium::types::CallbackAccount;
 
 const COMP_DEF_OFFSET_INITIALIZE_MARKET: u32 = comp_def_offset("initialize_market");
 const COMP_DEF_OFFSET_PLACE_BET: u32 = comp_def_offset("place_bet");
