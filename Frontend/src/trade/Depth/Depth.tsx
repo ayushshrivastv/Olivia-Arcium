@@ -43,15 +43,23 @@ export default function Depth({ market, isNYCMayorMarket = false }: { market: st
 
   return (
     <div className="flex flex-col w-full">
-      <div className="pt-2 px-2">
+      <div className="pt-2 px-2 flex-shrink-0">
         <TableHeader isNYCMayorMarket={isNYCMayorMarket} />
       </div>
-      <div className="flex mt-2">
-        <div className="w-1/2 pr-1">
-          {asks && <NoTable asks={asks.slice(0, 50)} isNYCMayorMarket={isNYCMayorMarket} />}
+      <div className="flex mt-2 flex-1 overflow-hidden">
+        <div className="w-1/2 pr-1 flex flex-col overflow-hidden">
+          {asks && (
+            <div className="flex-1 overflow-y-auto">
+              <NoTable asks={asks.slice(0, 50)} isNYCMayorMarket={isNYCMayorMarket} />
+            </div>
+          )}
         </div>
-        <div className="w-1/2 pl-1">
-          {bids && <YesTable bids={bids.slice(0, 50)} isNYCMayorMarket={isNYCMayorMarket} />}
+        <div className="w-1/2 pl-1 flex flex-col overflow-hidden">
+          {bids && (
+            <div className="flex-1 overflow-y-auto">
+              <YesTable bids={bids.slice(0, 50)} isNYCMayorMarket={isNYCMayorMarket} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -59,31 +67,6 @@ export default function Depth({ market, isNYCMayorMarket = false }: { market: st
 }
 
 function TableHeader({ isNYCMayorMarket }: { isNYCMayorMarket: boolean }) {
-  if (isNYCMayorMarket) {
-    const candidates = [
-      { name: 'Zohran Mamdani', percentage: 88.8 },
-      { name: 'Andrew Cuomo', percentage: 11.1 },
-      { name: 'Curtis Sliwa', percentage: 0.8 },
-      { name: 'Eric Adams', percentage: 0.5 },
-    ];
-
-    return (
-      <div className="flex flex-col gap-1 pb-2">
-        {candidates.map((candidate) => (
-          <div key={candidate.name} className="flex justify-between text-xs text-muted-foreground">
-            <span>{candidate.name}</span>
-            <span>{candidate.percentage < 1 ? '<1%' : `${candidate.percentage.toFixed(1)}%`}</span>
-          </div>
-        ))}
-        <div className="flex text-xs text-muted-foreground border-t border-border/20 pt-2 mt-1">
-          <div className="w-1/3 text-left">No</div>
-          <div className="w-1/3 text-center">Yes</div>
-          <div className="w-1/3 text-right">Size</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex text-xs text-muted-foreground border-b border-border/20 pb-2">
       <div className="w-1/3 text-left">No</div>

@@ -5,8 +5,9 @@ import axios from 'axios';
 import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';
 import { ArrowDownIcon } from '@/src/components/Icons';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import Depth from '@/src/trade/Depth/Depth';
+import Image from 'next/image';
 
 interface SwapUIProps {
   baseCurrency: string;
@@ -69,6 +70,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [orderResult, setOrderResult] = useState<OrderResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showBetConfirmation, setShowBetConfirmation] = useState<boolean>(false);
 
   const sideMapping = useMemo<Record<OrderType, string>>(
     () => ({ BUY: 'Bid', SELL: 'Ask' }),
@@ -79,7 +81,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
     if (!amount || parseFloat(amount) <= 0) return;
 
     setLoading(true);
-    setError(null);
+    // Don't clear error here - only clear on order creation
 
     try {
       const payload: QuotePayload = {
@@ -96,7 +98,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
 
       setQuote(response.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to get quote');
+      // Silently handle quote errors - don't display network errors to user
       setQuote(null);
     } finally {
       setLoading(false);
@@ -110,7 +112,14 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   }, [amount, orderType, orderMode, getQuote]);
 
 
+  const handleBetClick = (): void => {
+    if (amount && parseFloat(amount) > 0) {
+      setShowBetConfirmation(true);
+    }
+  };
+
   const createOrder = async (): Promise<void> => {
+    setShowBetConfirmation(false);
     setLoading(true);
     setError(null);
     setOrderResult(null);
@@ -137,7 +146,8 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
 
       setOrderResult(response.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create order');
+      // Silently handle order creation errors - don't display network errors to user
+      console.error('Order creation error:', err);
     } finally {
       setLoading(false);
     }
@@ -363,11 +373,6 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
         </span>
       </div>
 
-      {error && (
-        <div className="flex-shrink-0 text-red-500 text-sm mb-2 p-2 bg-red-100 rounded-md">
-          {error}
-        </div>
-      )}
 
       {orderResult && (
         <div className="flex-shrink-0 text-green-500 text-sm mb-2 p-2 bg-green-100 rounded-md">
@@ -376,8 +381,8 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
       )}
 
       <div className="flex-shrink-0 mt-auto">
-        <Button
-          onClick={createOrder}
+        <button
+          onClick={handleBetClick}
           disabled={
             loading ||
             !amount ||
@@ -385,17 +390,42 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
             (orderMode === 'LIMIT' &&
               (!limitPrice || parseFloat(limitPrice) <= 0))
           }
-          className={`w-full py-6 ${
+          className={`w-full py-3 rounded-full text-sm transition-all duration-200 flex items-center justify-center ${
             loading ||
             !amount ||
             parseFloat(amount) <= 0 ||
             (orderMode === 'LIMIT' &&
               (!limitPrice || parseFloat(limitPrice) <= 0))
-              ? 'bg-secondary/50 text-muted-foreground cursor-not-allowed'
-              : orderType === 'BUY'
-              ? 'bg-green-500 hover:bg-green-600 text-white'
-              : 'bg-red-500 hover:bg-red-600 text-white'
+              ? 'text-muted-foreground cursor-not-allowed opacity-50'
+              : 'text-white'
           }`}
+          style={{
+            backgroundColor: loading ||
+              !amount ||
+              parseFloat(amount) <= 0 ||
+              (orderMode === 'LIMIT' &&
+                (!limitPrice || parseFloat(limitPrice) <= 0))
+              ? 'rgba(10, 10, 10, 0.7)'
+              : 'rgba(10, 10, 10, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+          }}
+          onMouseEnter={(e) => {
+            if (!loading &&
+                amount &&
+                parseFloat(amount) > 0 &&
+                !(orderMode === 'LIMIT' && (!limitPrice || parseFloat(limitPrice) <= 0))) {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading &&
+                amount &&
+                parseFloat(amount) > 0 &&
+                !(orderMode === 'LIMIT' && (!limitPrice || parseFloat(limitPrice) <= 0))) {
+              e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.7)';
+            }
+          }}
         >
           {loading ? (
             <>
@@ -409,15 +439,151 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
                 : `Sell ${selectedCandidate}`
               : `${orderType} ${baseCurrency.replace(/_+$/, '')}`
           )}
-        </Button>
+        </button>
       </div>
 
       {/* Depth Table Section - Scrollable */}
-      <div className="flex-shrink-0 mt-4 border-t border-border/20 pt-4">
-        <div className="h-64 overflow-y-auto">
-          <Depth market={market} isNYCMayorMarket={isNYCMayorMarket} />
-        </div>
+      <div className="flex-shrink-0 mt-4 border-t border-border/20 pt-4 flex flex-col" style={{ height: '256px' }}>
+        <Depth market={market} isNYCMayorMarket={isNYCMayorMarket} />
       </div>
+
+      {/* Bet Confirmation Modal */}
+      {showBetConfirmation && (
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 9999 }}
+          onClick={() => setShowBetConfirmation(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-xl p-6 max-h-[90vh] overflow-y-auto"
+            style={{
+              backgroundColor: 'rgba(10, 10, 10, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-white">Bet Confirmation</h2>
+              <button
+                onClick={() => setShowBetConfirmation(false)}
+                className="text-white hover:opacity-70 transition-opacity"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Bet Details */}
+              <div className="space-y-4">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Market</span>
+                      <span className="text-white font-medium">
+                        {isNYCMayorMarket ? 'NYC Mayoral Election' : `${baseCurrency}/${quoteCurrency}`}
+                      </span>
+                    </div>
+                    
+                    {isNYCMayorMarket && selectedCandidate && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Candidate</span>
+                        <span className="text-white font-medium">{selectedCandidate}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Order Type</span>
+                      <span className="text-white font-medium">{orderType}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Amount</span>
+                      <span className="text-white font-medium">{amount} SOL</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Execution Cost</span>
+                      <span className="text-white font-medium">{executionCost} SOL</span>
+                    </div>
+
+                    {orderMode === 'LIMIT' && limitPrice && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Limit Price</span>
+                        <span className="text-white font-medium">{limitPrice}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Notice */}
+              <div className="border-t border-white/10 pt-4 mt-4">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <p className="text-xs text-gray-300 leading-relaxed mb-4">
+                    Please review your bet details carefully. Once confirmed, the transaction will be processed on the blockchain.
+                  </p>
+                  
+                  {/* Magic Block Promotion */}
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+                    <Image
+                      src="/Magic Block.png"
+                      alt="Magic Block"
+                      width={100}
+                      height={100}
+                      className="flex-shrink-0"
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs text-white leading-relaxed">
+                        Powered by MagicBlock — offers{' '}
+                        <span className="font-semibold text-green-400">zero transaction fees</span>
+                        {' '}and faster block times.{' '}
+                        <a
+                          href="https://www.magicblock.xyz/blog/solana-plugins"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline"
+                        >
+                          Learn more
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowBetConfirmation(false)}
+                  className="px-4 py-2 rounded-full text-sm transition-all duration-200 border border-white/20 text-white hover:bg-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={createOrder}
+                  className="px-4 py-2 rounded-full text-sm transition-all duration-200 text-white"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                >
+                  Confirm Bet
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
