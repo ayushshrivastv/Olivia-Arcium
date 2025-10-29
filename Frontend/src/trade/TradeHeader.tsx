@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { getTicker } from '@/src/utils/httpClient';
 import { MarketIcon } from '@/src/market/MarketIcon';
@@ -68,19 +66,18 @@ export default function TradeHeader({
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-border/20">
       <div className="flex items-center">
-        <Link href="/" passHref className="flex items-center mr-6">
-          <Image src={'/logo.png'} height={54} width={54} alt={'logo'} />
-        </Link>
-
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 mr-8">
           <MarketIcon base_asset={baseCurrency} />
-          <h2 className="text-lg font-semibold">
-            {baseCurrency}
-            {quoteCurrency}
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold">{name || `${baseCurrency}${quoteCurrency}`}</h2>
+            <p className="text-xs text-muted-foreground">
+              {baseCurrency}
+              {quoteCurrency}
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center ml-8">
+        <div className="flex items-center">
           <div>
             <div className="text-xl font-bold">
               {(parseFloat(price) * 100).toFixed(2)}%
@@ -89,9 +86,6 @@ export default function TradeHeader({
             <div className="text-xs text-green-500">${priceChange}</div>
           </div>
         </div>
-      </div>
-      <div>
-        <div className="font-semibold text-lg">{name}</div>
       </div>
       {session.data?.user?.email && (
         <div className="flex items-center space-x-6">

@@ -13,19 +13,20 @@ type RoomPayloadMap = {
   ticker: TickerPayload;
 };
 
+// Mock SignalingManager for frontend development
 export class SignalingManager {
-  private ws: WebSocket;
   private static instance: SignalingManager;
-  private buffer: Record<string, unknown>[] = [];
   private depthCallbacks: Record<string, Callback<DepthPayload>[]> = {};
   private tradeCallbacks: Record<string, Callback<TradePayload>[]> = {};
   private tickerCallbacks: Record<string, Callback<TickerPayload>[]> = {};
   private id = 1;
-  private opened = false;
+  private opened = true; // Mock as always connected
+  private mockInterval: NodeJS.Timeout | null = null;
 
   private constructor() {
-    this.ws = new WebSocket(BASE_URL);
-    this.init();
+    // Mock WebSocket - no actual connection
+    console.log('SignalingManager: Mock mode - no WebSocket connection');
+    this.startMockData();
   }
 
   public static getInstance(): SignalingManager {
@@ -35,79 +36,83 @@ export class SignalingManager {
     return this.instance;
   }
 
-  private init() {
-    this.ws.onopen = () => {
-      this.opened = true;
-      this.buffer.forEach((m) => this.ws.send(JSON.stringify(m)));
-      this.buffer = [];
+  private startMockData() {
+    // Generate mock data every 2 seconds
+    this.mockInterval = setInterval(() => {
+      this.generateMockDepthData();
+      this.generateMockTradeData();
+      this.generateMockTickerData();
+    }, 2000);
+  }
+
+  private generateMockDepthData() {
+    const mockDepth: DepthPayload = {
+      bids: [
+        [String(0.45 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
+        [String(0.44 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
+        [String(0.43 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)]
+      ],
+      asks: [
+        [String(0.46 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
+        [String(0.47 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
+        [String(0.48 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)]
+      ]
     };
 
-    this.ws.onmessage = (evt) => {
-      const env = JSON.parse(evt.data);
-      const room: string = env.room;
+    Object.keys(this.depthCallbacks).forEach(room => {
+      this.depthCallbacks[room].forEach(cb => cb(mockDepth));
+    });
+  }
 
-      if (!room) return;
-
-      try {
-        const data = JSON.parse(env.data);
-
-        if (room.startsWith('depth@') && this.depthCallbacks[room]?.length) {
-          const { a: asks, b: bids } = data.data || {};
-
-          if (asks !== undefined && bids !== undefined) {
-            this.depthCallbacks[room].forEach((cb) => cb({ bids, asks }));
-          }
-        } else if (
-          room.startsWith('trade@') &&
-          this.tradeCallbacks[room]?.length
-        ) {
-          const { price, quantity, side, timestamp } = data;
-
-          if (price !== undefined) {
-            this.tradeCallbacks[room].forEach((cb) =>
-              cb({ price, quantity, side, timestamp })
-            );
-          }
-        } else if (
-          room.startsWith('ticker@') &&
-          this.tickerCallbacks[room]?.length
-        ) {
-          // Pass the entire parsed data object to callbacks
-          // The data format for ticker is { data: { e, p, q, s, t }, stream }
-          this.tickerCallbacks[room].forEach((cb) => cb(data));
-        }
-      } catch (error) {
-        console.error('Error processing message:', error);
-      }
+  private generateMockTradeData() {
+    const mockTrade: TradePayload = {
+      price: String(0.45 + Math.random() * 0.02),
+      quantity: String(Math.floor(Math.random() * 1000) + 100),
+      side: Math.random() > 0.5 ? 'buy' : 'sell',
+      timestamp: Date.now()
     };
 
-    this.ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    Object.keys(this.tradeCallbacks).forEach(room => {
+      this.tradeCallbacks[room].forEach(cb => cb(mockTrade));
+    });
+  }
+
+  private generateMockTickerData() {
+    const mockTicker: TickerPayload = {
+      data: {
+        e: 'trade',
+        p: String(0.45 + Math.random() * 0.02),
+        q: String(Math.floor(Math.random() * 1000) + 100),
+        s: 'ELECTION2028USDC',
+        t: Date.now()
+      },
+      stream: 'ticker@ELECTION2028USDC'
     };
+
+    Object.keys(this.tickerCallbacks).forEach(room => {
+      this.tickerCallbacks[room].forEach(cb => cb(mockTicker));
+    });
   }
 
   public subscribe(room: Room) {
-    const message = {
-      type: 'SUBSCRIBE',
-      payload: { room },
-    };
-    this.sendMessage(message);
+    // Mock subscription - just log it
+    console.log(`Mock subscribe to room: ${room}`);
   }
 
   public unsubscribe(room: Room) {
-    const message = {
-      type: 'UNSUBSCRIBE',
-      payload: { room },
-    };
-    this.sendMessage(message);
+    // Mock unsubscription - just log it
+    console.log(`Mock unsubscribe from room: ${room}`);
   }
 
   public sendMessage(msg: Record<string, unknown>) {
-    const withId = { ...msg, id: this.id++ } as Record<string, unknown> & { id: number };
-    if (!this.opened) {
-      this.buffer.push(withId);
-    } else {
-      this.ws.send(JSON.stringify(withId));
+    // Mock message sending - just log it
+    console.log('Mock send message:', msg);
+  }
+
+  public cleanup() {
+    if (this.mockInterval) {
+      clearInterval(this.mockInterval);
+      this.mockInterval = null;
     }
   }
 

@@ -8,13 +8,14 @@ import Link from 'next/link';
 
 interface MainLayoutProps {
   children: React.ReactNode;
+  showFooter?: boolean;
 }
 
-export function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col mx-auto max-w-7xl text-white" style={{ background: 'transparent', position: 'relative', zIndex: 10 }}>
       <Navbar />
-      <main className="flex-1 w-full bg-transparent pb-20">
+      <main className="flex-1 w-full bg-transparent" style={{ marginTop: '80px' }}>
         {children}
       </main>
       {/* Social Media Links - Bottom Right Corner */}
@@ -48,9 +49,11 @@ export function MainLayout({ children }: MainLayoutProps) {
           />
         </Link>
       </div>
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <Footer />
-      </div>
+      {showFooter && (
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <Footer />
+        </div>
+      )}
     </div>
   );
 }
