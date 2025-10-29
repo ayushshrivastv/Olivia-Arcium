@@ -274,7 +274,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
         <span
           className={orderType === 'BUY' ? 'text-green-500' : 'text-red-500'}
         >
-          {loading ? 'Calculating...' : `${executionCost} ${quoteCurrency}`}
+          {loading ? 'Calculating...' : `${executionCost} SOL`}
         </span>
       </div>
 
