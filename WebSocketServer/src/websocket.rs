@@ -1,3 +1,10 @@
+/*
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 use axum::extract::ws::{Message, WebSocket};
 use futures::{sink::SinkExt, stream::StreamExt};
 use std::{collections::HashMap, sync::Arc};

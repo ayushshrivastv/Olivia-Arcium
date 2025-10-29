@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -11,7 +18,7 @@ import { Trade } from '@/src/utils/types';
 import { getTrades } from '@/src/utils/httpClient';
 import { SignalingManager } from '@/src/utils/SignalingManager';
 
-export default function BottomTable({ market, baseCurrency, quoteCurrency }: { market: string; baseCurrency?: string; quoteCurrency?: string }) {
+export default function BottomTable({ market }: { market: string; baseCurrency?: string; quoteCurrency?: string }) {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

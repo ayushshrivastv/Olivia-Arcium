@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 import { create } from 'zustand';
 
 type Interval = '1m' | '1h' | '1d' | '1w';

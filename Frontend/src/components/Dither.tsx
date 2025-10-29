@@ -1,8 +1,8 @@
 /**
- * Olivia - AI Voice Assistant
- * Copyright (c) 2024 Ayush Srivastava
- * 
- * Licensed under the MIT License
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
  */
 
 'use client';

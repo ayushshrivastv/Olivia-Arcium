@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -6,7 +13,6 @@ import BottomTable from '@/src/trade/BottomTable';
 import ChartArea from '@/src/trade/Chart/ChartArea';
 import SwapUI from '@/src/trade/SwapUI';
 import TradeHeader from '@/src/trade/TradeHeader';
-import Depth from '@/src/trade/Depth/Depth';
 import { MainLayout } from '@/src/layout/Layout';
 
 export default function ClientTradingPage({
@@ -87,7 +93,7 @@ export default function ClientTradingPage({
       setChartHeight(newChartHeight);
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleMouseUp = () => {
       if (isResizingRef.current) {
         isResizingRef.current = false;
         document.body.style.cursor = '';
@@ -109,7 +115,6 @@ export default function ClientTradingPage({
       document.body.style.userSelect = '';
       isResizingRef.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

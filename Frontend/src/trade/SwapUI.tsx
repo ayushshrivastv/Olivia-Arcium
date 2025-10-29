@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 'use client';
 
 import { useState, useEffect, ChangeEvent, useCallback, useMemo } from 'react';
@@ -69,7 +76,6 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [orderResult, setOrderResult] = useState<OrderResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [showBetConfirmation, setShowBetConfirmation] = useState<boolean>(false);
 
   const sideMapping = useMemo<Record<OrderType, string>>(
@@ -97,7 +103,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
       );
 
       setQuote(response.data);
-    } catch (err) {
+    } catch {
       // Silently handle quote errors - don't display network errors to user
       setQuote(null);
     } finally {
@@ -121,7 +127,6 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const createOrder = async (): Promise<void> => {
     setShowBetConfirmation(false);
     setLoading(true);
-    setError(null);
     setOrderResult(null);
 
     try {

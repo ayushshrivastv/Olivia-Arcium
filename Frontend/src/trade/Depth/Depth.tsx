@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 'use client';
 import { useEffect, useState } from 'react';
 import { getDepth } from '@/src/utils/httpClient';
@@ -66,7 +73,7 @@ export default function Depth({ market, isNYCMayorMarket = false }: { market: st
   );
 }
 
-function TableHeader({ isNYCMayorMarket }: { isNYCMayorMarket: boolean }) {
+function TableHeader({ }: { isNYCMayorMarket: boolean }) {
   return (
     <div className="flex text-xs text-muted-foreground border-b border-border/20 pb-2">
       <div className="w-1/3 text-left">No</div>

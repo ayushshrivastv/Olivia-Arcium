@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 "use client";
 import React, { useRef } from "react";
 import {
@@ -5,7 +12,6 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-  useMotionTemplate,
 } from "motion/react";
 import { cn } from "@/src/lib/utils";
 
@@ -49,11 +55,6 @@ export const CometCard = ({
     [-0.5, 0.5],
     [`${translateDepth}px`, `-${translateDepth}px`],
   );
-
-  const glareX = useTransform(mouseXSpring, [-0.5, 0.5], [0, 100]);
-  const glareY = useTransform(mouseYSpring, [-0.5, 0.5], [0, 100]);
-
-  const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.9) 10%, rgba(255, 255, 255, 0.75) 20%, rgba(255, 255, 255, 0) 80%)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;

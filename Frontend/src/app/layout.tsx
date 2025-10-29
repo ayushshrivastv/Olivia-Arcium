@@ -1,3 +1,10 @@
+/**
+ * Olivia: Decentralised Permissionless Predicition Market 
+ * Copyright (c) 2025 Ayush Srivastava
+ *
+ * Licensed under the Apache 2.0
+ */
+
 import type { Metadata } from 'next';
 import './globals.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
