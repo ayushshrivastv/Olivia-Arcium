@@ -6,7 +6,7 @@
  * 2. Check/initialize MXE account
  * 3. Initialize computation definitions
  * 
- * Usage: node Scripts/init-arcium-localnet.js
+ * Usage: node Arcium/scripts/init-arcium-localnet.js
  */
 
 const { Connection, PublicKey } = require("@solana/web3.js");
@@ -49,7 +49,7 @@ async function checkArciumContainers() {
   
   try {
     const output = execSync(
-      "docker compose -f artifacts/docker-compose-arx-env.yml ps --format json",
+      "docker compose -f Arcium/artifacts/docker-compose-arx-env.yml ps --format json",
       { encoding: "utf-8", stdio: "pipe" }
     );
     
@@ -67,7 +67,7 @@ async function checkArciumContainers() {
       console.log("⚠️  No Arcium containers are running");
       console.log("   Starting containers may take some time, especially on ARM64...");
       console.log("   You can check container status with:");
-      console.log("   docker compose -f artifacts/docker-compose-arx-env.yml ps");
+      console.log("   docker compose -f Arcium/artifacts/docker-compose-arx-env.yml ps");
       return false;
     }
     
@@ -128,7 +128,7 @@ async function initializeMXE() {
   console.log("\n=== Step 2: Initialize MXE Account ===\n");
   
   try {
-    const result = execSync("node Scripts/init-mxe.js", {
+    const result = execSync("node Arcium/scripts/init-mxe.js", {
       encoding: "utf-8",
       stdio: "inherit",
     });
@@ -144,7 +144,7 @@ async function initializeCompDefs() {
   console.log("\n=== Step 3: Initialize Computation Definitions ===\n");
   
   try {
-    const result = execSync("node Scripts/init-comp-defs.js", {
+    const result = execSync("node Arcium/scripts/init-comp-defs.js", {
       encoding: "utf-8",
       stdio: "inherit",
     });
@@ -234,10 +234,10 @@ async function main() {
     console.error("\nTroubleshooting:");
     console.error("1. Ensure Solana localnet is running: solana-test-validator");
     console.error("2. Ensure Arcium containers are running");
-    console.error("3. Check container logs: docker compose -f artifacts/docker-compose-arx-env.yml logs");
+    console.error("3. Check container logs: docker compose -f Arcium/artifacts/docker-compose-arx-env.yml logs");
     console.error("4. Try running initialization steps individually:");
-    console.error("   - node Scripts/init-mxe.js");
-    console.error("   - node Scripts/init-comp-defs.js");
+    console.error("   - node Arcium/scripts/init-mxe.js");
+    console.error("   - node Arcium/scripts/init-comp-defs.js");
     console.error();
     process.exit(1);
   }

@@ -9,8 +9,8 @@
 
 import { useState, useEffect, ChangeEvent, useCallback, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { BN } from '@coral-xyz/anchor';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { BN, Wallet, Idl } from '@coral-xyz/anchor';
 import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';
 import { ArrowDownIcon } from '@/src/components/Icons';
@@ -97,12 +97,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUI
     status: 'idle',
     message: '',
   });
-  const [idl, setIdl] = useState<any>(null);
-
-  const sideMapping = useMemo<Record<OrderType, string>>(
-    () => ({ BUY: 'Bid', SELL: 'Ask' }),
-    []
-  );
+  const [idl, setIdl] = useState<Idl | null>(null);
 
   // Load IDL on mount
   useEffect(() => {
@@ -143,7 +138,7 @@ export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUI
     } finally {
       setLoading(false);
     }
-  }, [amount, market, orderType, sideMapping]);
+  }, [amount]);
 
   useEffect(() => {
     if (orderMode === 'MKT' && amount && parseFloat(amount) > 0) {
@@ -194,16 +189,15 @@ export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUI
     }
 
     try {
-      // Create provider and program
+      // Create provider and program  
       const walletAdapter = {
         publicKey: wallet.publicKey,
-        signTransaction: wallet.signTransaction,
-        signAllTransactions: wallet.signAllTransactions,
-        signMessage: wallet.signMessage,
+        signTransaction: wallet.signTransaction!,
+        signAllTransactions: wallet.signAllTransactions!,
       };
       
-      const provider = createAnchorProvider(connection, walletAdapter);
-      const program = createProgram(provider, idl);
+      const provider = createAnchorProvider(connection, walletAdapter as unknown as Wallet);
+      const program = createProgram(provider, idl as Idl);
 
       // Determine prediction: BUY = true (YES), SELL = false (NO)
       const prediction = orderType === 'BUY';
@@ -289,12 +283,13 @@ export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUI
         setAmount('');
         setTransactionStatus({ status: 'idle', message: '' });
       }, 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Place bet error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setTransactionStatus({
         status: 'error',
         message: 'Failed to place bet',
-        error: error.message || 'Unknown error occurred',
+        error: errorMessage,
       });
     } finally {
       setLoading(false);

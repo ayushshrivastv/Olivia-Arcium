@@ -35,7 +35,7 @@ export function createProgram(
   provider: AnchorProvider,
   idl: Idl
 ): Program<Idl> {
-  return new Program(idl, PREDICTION_MARKET_PROGRAM_ID, provider);
+  return new Program(idl, provider);
 }
 
 /**
@@ -54,14 +54,13 @@ export function useProgram(idl: Idl | null): {
     return { program: null, provider: null, connection: null };
   }
 
-  const walletAdapter: Wallet = {
+  const walletAdapter = {
     publicKey: wallet.publicKey,
     signTransaction: wallet.signTransaction!,
     signAllTransactions: wallet.signAllTransactions!,
-    signMessage: wallet.signMessage,
   };
 
-  const provider = createAnchorProvider(connection, walletAdapter);
+  const provider = createAnchorProvider(connection, walletAdapter as unknown as Wallet);
   const program = createProgram(provider, idl);
 
   return { program, provider, connection };
