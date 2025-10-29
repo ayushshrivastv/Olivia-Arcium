@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, ChangeEvent, useCallback, useMemo } from 'react';
-import Image from 'next/image';
 import axios from 'axios';
 import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';

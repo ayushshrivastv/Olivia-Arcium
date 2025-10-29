@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import BottomTable from '@/src/trade/BottomTable';
 import ChartArea from '@/src/trade/Chart/ChartArea';
 import SwapUI from '@/src/trade/SwapUI';
@@ -95,6 +96,24 @@ export default function ClientTradingPage({
 
   return (
     <MainLayout showFooter={false} showSocialIcons={false}>
+      {/* Arcium Logo - positioned below wallet button */}
+      <div className="fixed top-28 right-10 z-50 flex items-center gap-2">
+        <Image 
+          src="/Arcium Icon.png" 
+          alt="Arcium Icon" 
+          width={32} 
+          height={32}
+          className="object-contain"
+        />
+        <Image 
+          src="/Arcium logo.png" 
+          alt="Arcium Logo" 
+          width={120} 
+          height={32}
+          className="object-contain"
+        />
+      </div>
+
       <div className="flex flex-col bg-background text-foreground overflow-hidden" style={{ height: 'calc(100vh - 80px)' }}>
         <TradeHeader baseCurrency={baseCurrency} quoteCurrency={quoteCurrency} />
 
