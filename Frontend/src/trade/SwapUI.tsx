@@ -166,14 +166,6 @@ export default function SwapUI({ baseCurrency, quoteCurrency }: SwapUIProps) {
   const session = useSession();
   return (
     <>
-      {/* Arcium Logo and Icon */}
-      <div className="flex items-center gap-2 mb-6 justify-center">
-        <Image 
-          src="/Arcium Icon.png" 
-          alt="Arcium Icon" 
-          width={32} 
-          height={32}
-          className="object-contain"
         />
         <Image 
           src="/Arcium logo.png" 
