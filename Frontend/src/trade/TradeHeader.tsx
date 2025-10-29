@@ -70,9 +70,9 @@ export default function TradeHeader({
           <MarketIcon base_asset={baseCurrency} />
           <div>
             <h2 className="text-lg font-semibold">{name || `${baseCurrency}${quoteCurrency}`}</h2>
-            <span className="px-2 py-0.5 text-xs rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
+            <p className="text-xs text-muted-foreground">
               SOLANA
-            </span>
+            </p>
           </div>
         </div>
 
