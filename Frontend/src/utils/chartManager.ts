@@ -155,6 +155,11 @@ export class ChartManager {
     this.priceSeries.setData(priceData);
     this.volumeSeries.setData(volumeData);
 
+    // Initialize lastUpdateTime with the last data point timestamp
+    if (deduplicatedData.length > 0) {
+      this.lastUpdateTime = deduplicatedData[deduplicatedData.length - 1].timestamp;
+    }
+
     // Fit content and add margin
     chart.timeScale().fitContent();
   }
@@ -172,34 +177,46 @@ export class ChartManager {
       return;
     }
 
-    if (!this.lastUpdateTime) {
-      this.lastUpdateTime = new Date().getTime();
+    // Ensure timestamp is not older than the last update
+    // Lightweight-charts requires updates to be newer than existing data
+    if (this.lastUpdateTime && updatedPrice.time <= this.lastUpdateTime) {
+      console.debug('Skipping update: timestamp not newer than last update', {
+        newTime: updatedPrice.time,
+        lastTime: this.lastUpdateTime,
+      });
+      return;
     }
 
-    // Update price series
-    this.priceSeries.update({
-      time: (this.lastUpdateTime / 1000) as UTCTimestamp,
-      value: updatedPrice.close,
-    });
+    // Convert time from milliseconds to seconds for UTCTimestamp
+    const timeInSeconds = Math.floor(updatedPrice.time / 1000) as UTCTimestamp;
 
-    // Update volume series
-    this.volumeSeries.update({
-      time: (this.lastUpdateTime / 1000) as UTCTimestamp,
-      value: updatedPrice.volume,
-      color:
-        updatedPrice.close >= (this.currentBar.close || 0)
-          ? 'rgba(38, 166, 154, 0.5)' // Green with transparency
-          : 'rgba(239, 83, 80, 0.5)', // Red with transparency
-    });
+    try {
+      // Update price series
+      this.priceSeries.update({
+        time: timeInSeconds,
+        value: updatedPrice.close,
+      });
 
-    // Update current bar
-    this.currentBar = {
-      close: updatedPrice.close,
-      volume: updatedPrice.volume,
-    };
+      // Update volume series
+      this.volumeSeries.update({
+        time: timeInSeconds,
+        value: updatedPrice.volume,
+        color:
+          updatedPrice.close >= (this.currentBar.close || 0)
+            ? 'rgba(38, 166, 154, 0.5)' // Green with transparency
+            : 'rgba(239, 83, 80, 0.5)', // Red with transparency
+      });
 
-    if (updatedPrice.newCandleInitiated) {
+      // Update current bar
+      this.currentBar = {
+        close: updatedPrice.close,
+        volume: updatedPrice.volume,
+      };
+
+      // Update lastUpdateTime for tracking
       this.lastUpdateTime = updatedPrice.time;
+    } catch (error) {
+      console.error('Error updating chart:', error);
     }
   }
 
