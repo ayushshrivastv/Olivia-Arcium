@@ -14,6 +14,26 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
+// Filter out duplicate wallet adapters
+function getUniqueWallets() {
+  const wallets = [
+    new PhantomWalletAdapter(),
+    new SolflareWalletAdapter(),
+  ];
+  
+  // Use a Map to ensure unique wallets by name
+  const uniqueWallets = new Map();
+  
+  wallets.forEach(wallet => {
+    const name = wallet.name;
+    if (!uniqueWallets.has(name)) {
+      uniqueWallets.set(name, wallet);
+    }
+  });
+  
+  return Array.from(uniqueWallets.values());
+}
+
 interface SolanaProviderProps {
   children: ReactNode;
 }
@@ -25,14 +45,8 @@ export const SolanaProvider: FC<SolanaProviderProps> = ({ children }) => {
   // You can also provide a custom RPC endpoint
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-  // Configure wallets - Phantom and Solflare are available
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-    ],
-    []
-  );
+  // Configure wallets - use deduplication function to prevent duplicate keys
+  const wallets = useMemo(() => getUniqueWallets(), []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
