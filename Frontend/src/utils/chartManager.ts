@@ -123,17 +123,31 @@ export class ChartManager {
       borderVisible: false,
     });
 
+    // Sort data by timestamp and ensure unique timestamps
+    const sortedData = [...initialData].sort((a, b) => a.timestamp - b.timestamp);
+    
+    // Deduplicate timestamps by keeping the last value for each unique timestamp (in seconds)
+    const uniqueDataMap = new Map<number, typeof initialData[0]>();
+    sortedData.forEach((data) => {
+      const timeInSeconds = Math.floor(data.timestamp / 1000);
+      uniqueDataMap.set(timeInSeconds, data);
+    });
+    
+    const deduplicatedData = Array.from(uniqueDataMap.values()).sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+
     // Set initial data
-    const priceData = initialData.map((data) => ({
+    const priceData = deduplicatedData.map((data) => ({
       time: Math.floor(data.timestamp / 1000) as UTCTimestamp,
       value: data.close,
     }));
 
-    const volumeData = initialData.map((data, index) => ({
+    const volumeData = deduplicatedData.map((data, index) => ({
       time: Math.floor(data.timestamp / 1000) as UTCTimestamp,
       value: data.volume,
       color:
-        index > 0 && data.close >= initialData[index - 1].close
+        index > 0 && data.close >= deduplicatedData[index - 1].close
           ? 'rgba(38, 166, 154, 0.5)' // Green with transparency
           : 'rgba(239, 83, 80, 0.5)', // Red with transparency
     }));

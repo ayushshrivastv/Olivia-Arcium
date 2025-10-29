@@ -17,8 +17,16 @@ export default function ChartArea({ market }: { market: string }) {
   const { interval, view } = useChartStore();
 
   const toBar = (x: KLine) => {
-    const tsInMillis =
-      typeof x.end === 'string' ? parseInt(x.end, 10) : Number(x.end);
+    // Parse ISO date string or timestamp
+    let tsInMillis: number;
+    if (typeof x.end === 'string') {
+      // Try to parse as ISO date string first
+      const parsed = new Date(x.end).getTime();
+      tsInMillis = isNaN(parsed) ? parseInt(x.end, 10) : parsed;
+    } else {
+      tsInMillis = Number(x.end);
+    }
+    
     return {
       timestamp: tsInMillis,
       close: parseFloat(x.close),
