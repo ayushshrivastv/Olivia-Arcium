@@ -15,22 +15,42 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" style={{ background: '#0a0a0a', color: '#fafafa' }}>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        <script
+        <style
           dangerouslySetInnerHTML={{
             __html: `
-              document.documentElement.style.backgroundColor = '#0a0a0a';
-              document.documentElement.style.color = '#fafafa';
-              if(document.body) {
-                document.body.style.backgroundColor = '#0a0a0a';
-                document.body.style.color = '#fafafa';
+              html, body {
+                background-color: #0a0a0a !important;
+                color: #fafafa !important;
+                margin: 0;
+                padding: 0;
+              }
+              body {
+                opacity: 1;
+                transition: opacity 0.3s ease-in-out;
+              }
+              body.page-ready {
+                opacity: 1;
               }
             `,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (document.documentElement) {
+                    document.documentElement.setAttribute('data-hydrated', 'true');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
       </head>
-      <body className={`antialiased font-mono`} style={{ background: '#0a0a0a', color: '#fafafa' }}>
+      <body className="antialiased font-mono" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

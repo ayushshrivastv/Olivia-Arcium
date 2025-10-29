@@ -7,7 +7,22 @@ import { IconRocket } from '@tabler/icons-react';
 
 export default function HeroSection() {
   return (
-    <div className="w-full flex items-center justify-center pt-32 pb-16" style={{ minHeight: 'calc(100vh - 200px)' }}>
+    <div className="w-full flex items-center justify-center pt-32 pb-16 relative" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      {/* Olivia Logo - Right side */}
+      <div className="absolute hidden lg:block" style={{ zIndex: 5, right: '-2rem', top: '75%', transform: 'translateY(-50%)' }}>
+        <Image
+          src="/Olivia Logo.png"
+          alt="Olivia"
+          width={450}
+          height={450}
+          className="w-[450px] h-[450px] object-contain"
+          style={{
+            filter: 'drop-shadow(0 0 30px rgba(255, 255, 255, 0.15))',
+            opacity: 0.9,
+          }}
+        />
+      </div>
+      
       <div className="text-center px-4 max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-light mb-6 text-white" style={{ textShadow: '0 0 20px rgba(0,0,0,1), 0 0 40px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.9), 2px 2px 8px rgba(0,0,0,1)', WebkitTextStroke: '1px rgba(0,0,0,0.8)' }}>
           When Others Watch Chaos.
@@ -29,8 +44,9 @@ export default function HeroSection() {
               src="/Arcium Icon.png" 
               alt="Arcium" 
               width={60} 
-              height={14}
+              height={60}
               className="h-4 w-auto"
+              style={{ width: 'auto', height: '1rem' }}
             />
           </span>
           {' '}— the transparent layer for private prediction.
