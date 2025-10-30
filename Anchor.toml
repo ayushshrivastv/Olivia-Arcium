@@ -9,6 +9,9 @@ skip-lint = false
 [programs.localnet]
 PredictionMarket = "3vttzXAnNXM1SGdMWQgVBJWEkEFmtExhX5hDgEGv9qux"
 
+[programs.devnet]
+PredictionMarket = "AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2"
+
 [registry]
 url = "https://api.apr.dev"
 
