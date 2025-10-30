@@ -7,7 +7,7 @@
 
 import { DepthPayload, TradePayload, TickerPayload } from './types';
 
-export const BASE_URL = 'ws://localhost:8081/ws';
+export const BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8081/ws';
 
 type Callback<T> = (data: T) => void;
 
@@ -20,20 +20,23 @@ type RoomPayloadMap = {
   ticker: TickerPayload;
 };
 
-// Mock SignalingManager for frontend development
+type ServerMessage = {
+  room: string;
+  data: string; // JSON string payload
+};
+
 export class SignalingManager {
   private static instance: SignalingManager;
   private depthCallbacks: Record<string, Callback<DepthPayload>[]> = {};
   private tradeCallbacks: Record<string, Callback<TradePayload>[]> = {};
   private tickerCallbacks: Record<string, Callback<TickerPayload>[]> = {};
-  private id = 1;
-  private opened = true; // Mock as always connected
-  private mockInterval: NodeJS.Timeout | null = null;
+  private socket: WebSocket | null = null;
+  private reconnectDelayMs = 1000;
+  private maxReconnectDelayMs = 10000;
+  private pendingSubscriptions: Set<Room> = new Set();
 
   private constructor() {
-    // Mock WebSocket - no actual connection
-    console.log('SignalingManager: Mock mode - no WebSocket connection');
-    this.startMockData();
+    this.connect();
   }
 
   public static getInstance(): SignalingManager {
@@ -43,84 +46,69 @@ export class SignalingManager {
     return this.instance;
   }
 
-  private startMockData() {
-    // Generate mock data every 2 seconds
-    this.mockInterval = setInterval(() => {
-      this.generateMockDepthData();
-      this.generateMockTradeData();
-      this.generateMockTickerData();
-    }, 2000);
+  private connect() {
+    try {
+      this.socket = new WebSocket(BASE_URL);
+      this.socket.onopen = () => {
+        this.reconnectDelayMs = 1000;
+        this.pendingSubscriptions.forEach((room) => this.sendSubscribe(room as Room));
+      };
+      this.socket.onmessage = (evt) => this.handleMessage(evt.data);
+      this.socket.onclose = () => this.scheduleReconnect();
+      this.socket.onerror = () => this.scheduleReconnect();
+    } catch {
+      this.scheduleReconnect();
+    }
   }
 
-  private generateMockDepthData() {
-    const mockDepth: DepthPayload = {
-      bids: [
-        [String(0.45 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
-        [String(0.44 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
-        [String(0.43 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)]
-      ],
-      asks: [
-        [String(0.46 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
-        [String(0.47 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)],
-        [String(0.48 + Math.random() * 0.02), String(Math.floor(Math.random() * 2000) + 500)]
-      ]
-    };
-
-    Object.keys(this.depthCallbacks).forEach(room => {
-      this.depthCallbacks[room].forEach(cb => cb(mockDepth));
-    });
+  private scheduleReconnect() {
+    this.socket = null;
+    const delay = this.reconnectDelayMs;
+    this.reconnectDelayMs = Math.min(this.reconnectDelayMs * 2, this.maxReconnectDelayMs);
+    setTimeout(() => this.connect(), delay);
   }
 
-  private generateMockTradeData() {
-    const mockTrade: TradePayload = {
-      price: String(0.45 + Math.random() * 0.02),
-      quantity: String(Math.floor(Math.random() * 1000) + 100),
-      side: Math.random() > 0.5 ? 'buy' : 'sell',
-      timestamp: Date.now()
-    };
-
-    Object.keys(this.tradeCallbacks).forEach(room => {
-      this.tradeCallbacks[room].forEach(cb => cb(mockTrade));
-    });
+  private handleMessage(raw: string) {
+    try {
+      const msg: ServerMessage = JSON.parse(raw);
+      const { room, data } = msg;
+      if (room.startsWith('depth@')) {
+        const payload: DepthPayload = JSON.parse(data);
+        this.depthCallbacks[room]?.forEach((cb) => cb(payload));
+      } else if (room.startsWith('trade@')) {
+        const payload: TradePayload = JSON.parse(data);
+        this.tradeCallbacks[room]?.forEach((cb) => cb(payload));
+      } else if (room.startsWith('ticker@')) {
+        const payload: TickerPayload = JSON.parse(data);
+        this.tickerCallbacks[room]?.forEach((cb) => cb(payload));
+      }
+    } catch (e) {
+      console.warn('Failed to parse server message', e);
+    }
   }
 
-  private generateMockTickerData() {
-    const mockTicker: TickerPayload = {
-      data: {
-        e: 'trade',
-        p: String(0.45 + Math.random() * 0.02),
-        q: String(Math.floor(Math.random() * 1000) + 100),
-        s: 'ELECTION2028USDC',
-        t: Date.now()
-      },
-      stream: 'ticker@ELECTION2028USDC'
-    };
+  private send(obj: unknown) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(obj));
+    }
+  }
 
-    Object.keys(this.tickerCallbacks).forEach(room => {
-      this.tickerCallbacks[room].forEach(cb => cb(mockTicker));
-    });
+  private sendSubscribe(room: Room) {
+    this.send({ type: 'SUBSCRIBE', payload: { room } });
+  }
+
+  private sendUnsubscribe(room: Room) {
+    this.send({ type: 'UNSUBSCRIBE', payload: { room } });
   }
 
   public subscribe(room: Room) {
-    // Mock subscription - just log it
-    console.log(`Mock subscribe to room: ${room}`);
+    this.pendingSubscriptions.add(room);
+    this.sendSubscribe(room);
   }
 
   public unsubscribe(room: Room) {
-    // Mock unsubscription - just log it
-    console.log(`Mock unsubscribe from room: ${room}`);
-  }
-
-  public sendMessage(msg: Record<string, unknown>) {
-    // Mock message sending - just log it
-    console.log('Mock send message:', msg);
-  }
-
-  public cleanup() {
-    if (this.mockInterval) {
-      clearInterval(this.mockInterval);
-      this.mockInterval = null;
-    }
+    this.pendingSubscriptions.delete(room);
+    this.sendUnsubscribe(room);
   }
 
   public registerDepthCallback(
@@ -149,9 +137,7 @@ export class SignalingManager {
     cb: Callback<DepthPayload>
   ) {
     if (!this.depthCallbacks[room]) return;
-    this.depthCallbacks[room] = this.depthCallbacks[room].filter(
-      (x) => x !== cb
-    );
+    this.depthCallbacks[room] = this.depthCallbacks[room].filter((x) => x !== cb);
   }
 
   public deRegisterTradeCallback(
@@ -159,9 +145,7 @@ export class SignalingManager {
     cb: Callback<TradePayload>
   ) {
     if (!this.tradeCallbacks[room]) return;
-    this.tradeCallbacks[room] = this.tradeCallbacks[room].filter(
-      (x) => x !== cb
-    );
+    this.tradeCallbacks[room] = this.tradeCallbacks[room].filter((x) => x !== cb);
   }
 
   public deRegisterTickerCallback(
@@ -169,54 +153,32 @@ export class SignalingManager {
     cb: Callback<TickerPayload>
   ) {
     if (!this.tickerCallbacks[room]) return;
-    this.tickerCallbacks[room] = this.tickerCallbacks[room].filter(
-      (x) => x !== cb
-    );
+    this.tickerCallbacks[room] = this.tickerCallbacks[room].filter((x) => x !== cb);
   }
 
-  // Fixed type-safe register callback method
   public registerCallback<T extends RoomType>(
     room: `${T}@${string}`,
     cb: Callback<RoomPayloadMap[T]>
   ) {
     if (room.startsWith('depth@')) {
-      this.registerDepthCallback(
-        room as `depth@${string}`,
-        cb as Callback<DepthPayload>
-      );
+      this.registerDepthCallback(room as `depth@${string}`, cb as Callback<DepthPayload>);
     } else if (room.startsWith('trade@')) {
-      this.registerTradeCallback(
-        room as `trade@${string}`,
-        cb as Callback<TradePayload>
-      );
+      this.registerTradeCallback(room as `trade@${string}`, cb as Callback<TradePayload>);
     } else if (room.startsWith('ticker@')) {
-      this.registerTickerCallback(
-        room as `ticker@${string}`,
-        cb as Callback<TickerPayload>
-      );
+      this.registerTickerCallback(room as `ticker@${string}`, cb as Callback<TickerPayload>);
     }
   }
 
-  // Fixed type-safe deregister callback method
   public deRegisterCallback<T extends RoomType>(
     room: `${T}@${string}`,
     cb: Callback<RoomPayloadMap[T]>
   ) {
     if (room.startsWith('depth@')) {
-      this.deRegisterDepthCallback(
-        room as `depth@${string}`,
-        cb as Callback<DepthPayload>
-      );
+      this.deRegisterDepthCallback(room as `depth@${string}`, cb as Callback<DepthPayload>);
     } else if (room.startsWith('trade@')) {
-      this.deRegisterTradeCallback(
-        room as `trade@${string}`,
-        cb as Callback<TradePayload>
-      );
+      this.deRegisterTradeCallback(room as `trade@${string}`, cb as Callback<TradePayload>);
     } else if (room.startsWith('ticker@')) {
-      this.deRegisterTickerCallback(
-        room as `ticker@${string}`,
-        cb as Callback<TickerPayload>
-      );
+      this.deRegisterTickerCallback(room as `ticker@${string}`, cb as Callback<TickerPayload>);
     }
   }
 }
