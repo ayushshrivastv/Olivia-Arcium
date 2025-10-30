@@ -65,7 +65,7 @@ function getClusterAccountOrThrow(): PublicKey {
       `Invalid NEXT_PUBLIC_ARCIUM_CLUSTER_OFFSET "${envOffset}". It must be a non-negative integer.`
     );
   }
-  return getClusterAccAddress(offsetNum);
+  return getClusterAccAddress(offsetNum) as PublicKey;
 }
 
 // Helper function to initialize a market
