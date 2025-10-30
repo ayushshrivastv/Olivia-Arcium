@@ -8,7 +8,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import {
-  getMXEPublicKey,
   getMXEAccAddress,
   getMempoolAccAddress,
   getExecutingPoolAccAddress,

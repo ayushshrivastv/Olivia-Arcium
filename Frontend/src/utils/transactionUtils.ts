@@ -239,7 +239,7 @@ export async function checkTransactionStatusWithFallback(
 }> {
   try {
     return await checkTransactionStatus(connection, signature, commitment);
-  } catch (error) {
+  } catch {
     console.warn('Primary RPC failed, this is expected sometimes on public RPCs');
     console.log('Transaction signature:', signature);
     const cluster = process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'testnet';

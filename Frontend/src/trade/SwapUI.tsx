@@ -10,7 +10,7 @@
 import { useState, useEffect, ChangeEvent, useCallback, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
-import { BN, Wallet, Idl, AnchorProvider } from '@coral-xyz/anchor';
+import { BN, Wallet, Idl, AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Button } from '@/src/ui/Button';
 import { Input } from '@/src/ui/Input';
 import { ArrowDownIcon } from '@/src/components/Icons';
@@ -51,7 +51,7 @@ const POOL_ACCOUNT = new PublicKey('7MGSS4iKNM4sVib7bDZDJhVqB6EcchPwVnTKenCY1jt3
 const CLOCK_ACCOUNT = new PublicKey('FHriyvoZotYiFnbUzKFjzRSb2NiaC8RPWY7jtKuKhg65');
 
 // Resolve Arcium cluster account from ENV
-function getClusterAccountOrThrow(): any {
+function getClusterAccountOrThrow(): PublicKey {
   let envOffset = process.env.NEXT_PUBLIC_ARCIUM_CLUSTER_OFFSET;
   if (!envOffset || envOffset.trim().length === 0) {
     console.warn(
@@ -70,11 +70,11 @@ function getClusterAccountOrThrow(): any {
 
 // Helper function to initialize a market
 async function initializeMarket(
-  program: any,
+  program: Program<Idl>,
   provider: AnchorProvider,
-  authority: any,
+  authority: PublicKey,
   marketId: number,
-  marketPDA: any,
+  marketPDA: PublicKey,
   computationOffset: BN
 ): Promise<void> {
   console.log('Initializing market with ID:', marketId);
@@ -263,8 +263,6 @@ export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUI
     message: '',
   });
   const [idl, setIdl] = useState<Idl | null>(null);
-  // Force-off MagicBlock for reliability on devnet; use single provider connection
-  const useEphemeralRollup = false;
 
   // Load IDL on mount
   useEffect(() => {
@@ -357,14 +355,13 @@ export default function SwapUI({ baseCurrency, quoteCurrency, marketId }: SwapUI
 
     try {
       // Provider selection: use normal Solana connection only (no MagicBlock)
-      let provider;
       // Default provider only
       const walletAdapter = {
         publicKey: wallet.publicKey,
         signTransaction: wallet.signTransaction!,
         signAllTransactions: wallet.signAllTransactions!,
       };
-      provider = createAnchorProvider(connection, walletAdapter as unknown as Wallet);
+      const provider = createAnchorProvider(connection, walletAdapter as unknown as Wallet);
       const program = createProgram(provider, idl as Idl);
 
       // DEMO PATH: bypass Arcium and send a simple on-chain tx for signature
