@@ -68,7 +68,9 @@ To verify that everything is actually deployed and operational on-chain, you can
 
 **Arcium Program (Devnet)**: [`BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6`](https://solscan.io/account/BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6?cluster=devnet) - This is the core Arcium encrypted computation program that we clone to our localnet. It's a verified, production-tested program deployed on Solana devnet that handles all encrypted computation orchestration across the network.
 
-**Olivia Prediction Market Program**: [`AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2`](https://solscan.io/account/AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2?cluster=devnet) - This is our deployed Prediction Market program. When deployed to devnet or mainnet, you'll be able to verify it's on-chain and see all the market creation, betting, and resolution transactions. The program handles market lifecycle management and coordinates with Arcium for encrypted computation processing.
+**Olivia Prediction Market Program**: [`AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2`](https://solscan.io/account/AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2?cluster=devnet) - This is our deployed Prediction Market program on devnet. You can verify it's on-chain and see all the market creation, betting, and resolution transactions. The program handles market lifecycle management and coordinates with Arcium for encrypted computation processing.
+
+**MXE Account**: [`HU4B2wmTKLADBSKRjkXCrTgJB3sY2dP3xJj19Dn4HJz1`](https://solscan.io/account/HU4B2wmTKLADBSKRjkXCrTgJB3sY2dP3xJj19Dn4HJz1?cluster=devnet) - The Multi-Party Execution Environment that coordinates encrypted computations for the prediction market on devnet.
 
 All of our computation definitions are also on-chain as Program Derived Addresses (PDAs) derived from these program addresses, meaning you can verify that the `initialize_market`, `place_bet`, and `distribute_rewards` computation definitions have been properly initialized and are ready to process encrypted transactions.
 
