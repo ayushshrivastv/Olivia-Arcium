@@ -60,7 +60,7 @@ export default function HeroSection() {
         </p>
         <div className="flex justify-center space-x-4">
           <Link
-            href="/signin"
+            href="/olivia"
             className="px-6 py-2 rounded-full text-white text-sm transition-all duration-200"
             style={{
               backgroundColor: 'rgba(10, 10, 10, 0.7)',
