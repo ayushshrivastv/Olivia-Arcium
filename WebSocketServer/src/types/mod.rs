@@ -50,8 +50,9 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
-        let redis_client = redis::Client::open("redis://127.0.0.1/")
-            .expect("Failed to connect to Redis. Ensure Redis is running on redis://127.0.0.1/");
+        let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://127.0.0.1/".to_string());
+        let redis_client = redis::Client::open(redis_url)
+            .expect("Failed to connect to Redis. Ensure REDIS_URL is set correctly (e.g., redis://127.0.0.1/)");
 
         AppState {
             channels: Mutex::new(HashMap::new()),
