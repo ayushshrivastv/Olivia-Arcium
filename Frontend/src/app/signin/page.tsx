@@ -37,7 +37,7 @@ export default function SignInPage() {
                   Welcome to Olivia
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  Sign in to start trading on prediction markets
+                  Olivia
                 </p>
 
                 <div className="grid w-full">
