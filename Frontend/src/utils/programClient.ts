@@ -9,13 +9,17 @@ import { PublicKey, Connection, Commitment } from "@solana/web3.js";
 import { AnchorProvider, Program, Wallet, Idl, BN } from "@coral-xyz/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
-// Program ID from lib.rs: declare_id!("3vttzXAnNXM1SGdMWQgVBJWEkEFmtExhX5hDgEGv9qux");
-export const PREDICTION_MARKET_PROGRAM_ID = new PublicKey(
-  "3vttzXAnNXM1SGdMWQgVBJWEkEFmtExhX5hDgEGv9qux"
-);
+// Program ID is read from env for flexibility across clusters.
+// Fallback uses the documented Devnet deployment.
+const PROGRAM_ID_STR =
+  process.env.NEXT_PUBLIC_PREDICTION_MARKET_PROGRAM_ID ||
+  "3aGW1X9fXUxFGozGp2F63jAFq3nvWiZdTFWKdTWijsET";
+
+export const PREDICTION_MARKET_PROGRAM_ID = new PublicKey(PROGRAM_ID_STR);
 
 /**
  * Initialize Anchor provider from wallet and connection
+ * with optimized settings for devnet reliability
  */
 export function createAnchorProvider(
   connection: Connection,
@@ -24,7 +28,9 @@ export function createAnchorProvider(
 ): AnchorProvider {
   return new AnchorProvider(connection, wallet, {
     commitment,
-    skipPreflight: false,
+    skipPreflight: true, // Skip preflight for better reliability on congested networks
+    preflightCommitment: commitment,
+    maxRetries: 3, // Retry failed transactions
   });
 }
 
@@ -77,6 +83,13 @@ export async function loadIdl(idlUrl: string): Promise<Idl> {
   return response.json();
 }
 
+function bigintToEightBytesLE(val: bigint): Uint8Array {
+  const arr = new Uint8Array(8);
+  const view = new DataView(arr.buffer);
+  view.setBigUint64(0, val, true); // true = little-endian
+  return arr;
+}
+
 /**
  * Get market PDA
  */
@@ -85,8 +98,7 @@ export function getMarketPDA(marketId: BN | number | string): PublicKey {
     ? new BN(marketId)
     : marketId;
   
-  const marketIdBuffer = Buffer.alloc(8);
-  marketIdBuffer.writeBigUInt64LE(BigInt(marketIdBN.toString()), 0);
+  const marketIdBuffer = bigintToEightBytesLE(BigInt(marketIdBN.toString()));
 
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from("market"), marketIdBuffer],
@@ -107,8 +119,7 @@ export function getBetPDA(
     ? new BN(marketId)
     : marketId;
   
-  const marketIdBuffer = Buffer.alloc(8);
-  marketIdBuffer.writeBigUInt64LE(BigInt(marketIdBN.toString()), 0);
+  const marketIdBuffer = bigintToEightBytesLE(BigInt(marketIdBN.toString()));
 
   const [pda] = PublicKey.findProgramAddressSync(
     [
