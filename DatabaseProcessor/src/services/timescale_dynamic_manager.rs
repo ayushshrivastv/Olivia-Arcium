@@ -8,6 +8,8 @@
 use anyhow::{anyhow, Result};
 use sqlx::{Executor, PgPool};
 use tracing::{error, info, warn};
+use serde::Serialize;
+use crate::services::PubSubPublisher;
 
 use crate::types::AddTradePayload;
 
@@ -153,5 +155,78 @@ pub async fn process_trade_dynamically(
         "Inserted trade for ticker '{}' into table public.{}.",
         trade_payload.ticker, table_name
     );
+    // Publish trade/ticker updates to Redis PUB/SUB for WebSocketServer
+    let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://127.0.0.1/".to_string());
+
+    #[derive(Serialize)]
+    struct TradeMsg<'a> {
+        price: String,
+        quantity: String,
+        side: String,
+        timestamp: i64,
+        ticker: &'a str,
+    }
+
+    #[derive(Serialize)]
+    struct TickerMsg<'a> {
+        data: TickerData<'a>,
+        stream: String,
+    }
+
+    #[derive(Serialize)]
+    struct TickerData<'a> {
+        e: &'a str,
+        p: String,
+        q: String,
+        s: &'a str,
+        t: i64,
+    }
+
+    let now_ms = chrono::Utc::now().timestamp_millis();
+    let trade_msg = TradeMsg {
+        price: price_f64.to_string(),
+        quantity: quantity_f64.to_string(),
+        side: "buy".to_string(),
+        timestamp: now_ms,
+        ticker: &trade_payload.ticker,
+    };
+    let ticker_msg = TickerMsg {
+        data: TickerData {
+            e: "trade",
+            p: price_f64.to_string(),
+            q: quantity_f64.to_string(),
+            s: &trade_payload.ticker,
+            t: now_ms,
+        },
+        stream: format!("ticker@{}", trade_payload.ticker),
+    };
+
+    let trade_channel = format!("trade@{}", trade_payload.ticker);
+    let ticker_channel = format!("ticker@{}", trade_payload.ticker);
+
+    if let Ok(json) = serde_json::to_string(&trade_msg) {
+        if let Ok(mut pubber) = PubSubPublisher::new(&redis_url) {
+            if pubber.publish(&trade_channel, &json).is_ok() {
+                info!("Published trade message to {}", trade_channel);
+            } else {
+                warn!("Failed to publish trade message to {}", trade_channel);
+            }
+        } else {
+            warn!("Failed to create Redis publisher for trade message");
+        }
+    }
+
+    if let Ok(json) = serde_json::to_string(&ticker_msg) {
+        if let Ok(mut pubber) = PubSubPublisher::new(&redis_url) {
+            if pubber.publish(&ticker_channel, &json).is_ok() {
+                info!("Published ticker message to {}", ticker_channel);
+            } else {
+                warn!("Failed to publish ticker message to {}", ticker_channel);
+            }
+        } else {
+            warn!("Failed to create Redis publisher for ticker message");
+        }
+    }
+
     Ok(())
 }
