@@ -12,7 +12,7 @@ const COMP_DEF_OFFSET_INITIALIZE_MARKET: u32 = comp_def_offset("initialize_marke
 const COMP_DEF_OFFSET_PLACE_BET: u32 = comp_def_offset("place_bet");
 const COMP_DEF_OFFSET_DISTRIBUTE_REWARDS: u32 = comp_def_offset("distribute_rewards");
 
-declare_id!("AMgZmVhB17SVSQAbhTHaZzHPurArHaJ7zJeLdcwKRhE2");
+declare_id!("3aGW1X9fXUxFGozGp2F63jAFq3nvWiZdTFWKdTWijsET");
 
 #[account]
 pub struct SignerAccount {
