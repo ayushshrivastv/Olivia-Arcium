@@ -24,7 +24,12 @@ async fn main() {
         .route("/ws", get(handlers::ws_handler))
         .with_state(state);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8081));
+    let port: u16 = std::env::var("WEB_SOCKET_PORT")
+        .or_else(|_| std::env::var("PORT"))
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8081);
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     info!("WebSocket server listening on ws://{}", addr);
 
     axum::serve(
