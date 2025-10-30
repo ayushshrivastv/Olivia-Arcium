@@ -76,7 +76,7 @@ export default function HeroSection() {
               e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
             }}
           >
-            Sign In
+            Olivia
           </Link>
           <Link
             href="/markets"
