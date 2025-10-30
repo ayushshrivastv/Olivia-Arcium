@@ -7,7 +7,6 @@
 
 'use client';
 
-import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -30,64 +29,20 @@ export default function SignInPage() {
 
       <div className="hide-scrollbar min-h-[calc(100vh-7rem)]">
         <div className="flex h-full w-full items-center justify-center">
-          <div className="flex justify-center">
-            <div className="container mx-auto flex max-w-[646px] flex-col">
-              <div className="flex flex-col gap-6 p-8 bg-card rounded-2xl border border-border">
-                <h3 className="text-3xl font-bold mb-4">
-                  Welcome to Olivia
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  Olivia
-                </p>
-
-                <div className="grid w-full">
-                  <button
-                    className="py-4 justify-center items-center border whitespace-nowrap outline-none rounded-2xl border-border transition-all duration-250 hover:opacity-90 text-white font-medium"
-                    style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    }}
-                    onClick={async () => {
-                      await signIn('credentials', {
-                        callbackUrl: '/',
-                        email: 'demo@olivia.com',
-                      });
-                    }}
-                  >
-                    <span className="flex-1">Continue with Demo Account</span>
-                  </button>
-                </div>
-
-                <div className="font-small flex flex-col items-center justify-start text-muted-foreground text-sm">
-                  <span>
-                    By continuing you agree with our{' '}
-                    <Link
-                      href="/"
-                      target="_blank"
-                      className="text-foreground underline"
-                    >
-                      Terms of Service
-                    </Link>
-                    ,{' '}
-                    <Link
-                      href="/"
-                      target="_blank"
-                      className="text-foreground underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                    , and our{' '}
-                    <Link
-                      href="/"
-                      target="_blank"
-                      className="text-foreground underline"
-                    >
-                      Risk Disclosure.
-                    </Link>
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div className="w-full max-w-6xl px-4">
+            <video
+              src="/Arcium Clip 1 .mp4"
+              controls
+              autoPlay
+              loop
+              className="w-full h-auto rounded-3xl shadow-2xl"
+              style={{
+                borderRadius: '24px',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       </div>
