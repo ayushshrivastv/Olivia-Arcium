@@ -18,28 +18,10 @@ import { clusterApiUrl } from "@solana/web3.js";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
+  CoinbaseWalletAdapter,
+  TrustWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import "@solana/wallet-adapter-react-ui/styles.css";
-
-// Filter out duplicate wallet adapters
-function getUniqueWallets() {
-  const wallets = [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ];
-  
-  // Use a Map to ensure unique wallets by name
-  const uniqueWallets = new Map();
-  
-  wallets.forEach(wallet => {
-    const name = wallet.name;
-    if (!uniqueWallets.has(name)) {
-      uniqueWallets.set(name, wallet);
-    }
-  });
-  
-  return Array.from(uniqueWallets.values());
-}
 
 interface SolanaProviderProps {
   children: ReactNode;
@@ -47,17 +29,43 @@ interface SolanaProviderProps {
 
 export const SolanaProvider: FC<SolanaProviderProps> = ({ children }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
-  const network = WalletAdapterNetwork.Devnet;
+  const envNetwork = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'testnet') as
+    | 'devnet'
+    | 'testnet'
+    | 'mainnet-beta';
 
-  // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const network =
+    envNetwork === 'devnet'
+      ? WalletAdapterNetwork.Devnet
+      : envNetwork === 'mainnet-beta'
+      ? WalletAdapterNetwork.Mainnet
+      : WalletAdapterNetwork.Testnet;
 
-  // Configure wallets - use deduplication function to prevent duplicate keys
-  const wallets = useMemo(() => getUniqueWallets(), []);
+  const endpoint = useMemo(() => {
+    const override = process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
+    if (override && override.trim().length > 0) {
+      console.log('🔧 Using RPC override from env:', override);
+      return override;
+    }
+    const derived = clusterApiUrl(network);
+    console.log('🌐 Using cluster RPC:', derived, 'for network:', envNetwork);
+    return derived;
+  }, [network, envNetwork]);
+
+  // Provide Solana wallets as a stable static array. Deduplication is not needed and causes key duplication.
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new TrustWalletAdapter(),
+    ],
+    []
+  );
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={false}>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
